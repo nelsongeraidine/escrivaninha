@@ -10,6 +10,8 @@ import '@fontsource/inter/500.css';
 // tokens antes de base: base.css consome as custom properties definidas em tokens.css.
 import './styles/tokens.css';
 import './styles/base.css';
+import './styles/wood.css';
+import './styles/library.css';
 import { App } from './app/App';
 
 createRoot(document.getElementById('root')!).render(
