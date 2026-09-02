@@ -32,6 +32,9 @@ export function useBookNavigation(pageCount: number, mode: ViewMode, initialPage
   });
   const [flip, setFlip] = useState<Flip | null>(null);
   const queued = useRef<'next' | 'prev' | null>(null);
+  // Alvo de um `goToPage` chamado durante o flip: aplicado sem animação ao
+  // terminar a virada, para o salto não se perder como no-op.
+  const queuedPage = useRef<number | null>(null);
   const spreadIndex = spreadForPage(page, mode, pageCount);
   const total = spreadCount(pageCount, mode);
 
@@ -39,7 +42,7 @@ export function useBookNavigation(pageCount: number, mode: ViewMode, initialPage
   const currentPage = firstPageOfSpread(spreadIndex, mode, pageCount);
 
   // Trocar de modo no meio de um flip deixaria uma sheet órfã: descartamos.
-  useEffect(() => { setFlip(null); queued.current = null; }, [mode]);
+  useEffect(() => { setFlip(null); queued.current = null; queuedPage.current = null; }, [mode]);
 
   const go = useCallback((target: number) => {
     const to = Math.min(Math.max(target, 0), total - 1);
@@ -64,8 +67,11 @@ export function useBookNavigation(pageCount: number, mode: ViewMode, initialPage
   }, [flip, go, spreadIndex]);
 
   const goToPage = useCallback((p: number) => {
-    if (flip) return;
-    go(spreadForPage(clampPage(p, pageCount), mode, pageCount));
+    const target = spreadForPage(clampPage(p, pageCount), mode, pageCount);
+    // Não dá para trocar o spread base no meio de um flip sem quebrar a
+    // animação; guarda o destino e `finishFlip` aplica o salto sem animar.
+    if (flip) { queuedPage.current = target; return; }
+    go(target);
   }, [flip, go, mode, pageCount]);
 
   const finishFlip = useCallback(() => {
@@ -73,8 +79,16 @@ export function useBookNavigation(pageCount: number, mode: ViewMode, initialPage
     const landed = flip.to;
     setPage(firstPageOfSpread(landed, mode, pageCount));
     setFlip(null);
+    const qp = queuedPage.current;
+    queuedPage.current = null;
     const q = queued.current;
     queued.current = null;
+    // Salto enfileirado por `goToPage` tem prioridade sobre next/prev pendente:
+    // o leitor pediu explicitamente uma página, então aplicamos sem animação.
+    if (qp !== null) {
+      if (qp !== landed) setPage(firstPageOfSpread(qp, mode, pageCount));
+      return;
+    }
     if (q) {
       const to = Math.min(Math.max(landed + (q === 'next' ? 1 : -1), 0), total - 1);
       if (to !== landed) setFlip({ from: landed, to, ...sheetForTransition(landed, to, mode, pageCount) });

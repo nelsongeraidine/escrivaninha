@@ -47,6 +47,17 @@ describe('useBookNavigation', () => {
     act(() => result.current.next());
     expect(result.current.spreadIndex).toBe(2);
   });
+  it('goToPage durante um flip enfileira o salto e aplica sem animação ao terminar', () => {
+    const { result } = renderHook(() => useBookNavigation(50, 'spread', 1, true));
+    act(() => result.current.next());
+    expect(result.current.flip).not.toBeNull();
+    // Pedido de página no meio da virada: não é no-op, fica enfileirado.
+    act(() => result.current.goToPage(30));
+    act(() => result.current.finishFlip());
+    expect(result.current.flip).toBeNull();
+    expect(result.current.spreadIndex).toBe(15);
+    expect(result.current.currentPage).toBe(30);
+  });
   it('goToPage distante não anima, só salta', () => {
     const { result } = renderHook(() => useBookNavigation(50, 'spread', 1, true));
     act(() => result.current.goToPage(40));
