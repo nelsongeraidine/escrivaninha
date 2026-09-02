@@ -85,7 +85,7 @@ Ao trocar de modo (rotacionar o celular, redimensionar), a página atual é pres
 - Avançar: `rotateY(0 → -180deg)`; voltar: `rotateY(-180 → 0)` da sheet anterior. Duração 650 ms, easing `cubic-bezier(0.4, 0, 0.2, 1)`.
 - A virada usa `@keyframes` CSS (transform da folha e opacidade das camadas de luz/sombra) e o React espera `animationend` para confirmar o novo spread.
 - Durante a animação, entradas de navegação são enfileiradas (no máximo 1 pendente) para não quebrar o estado; ao terminar, o estado lógico avança e a sheet volta a ser DOM estático.
-- `prefers-reduced-motion`: troca instantânea com fade de 150 ms.
+- `prefers-reduced-motion`: a troca é instantânea, sem fade (o spread é substituído no mesmo frame; desvio documentado do fade de 150 ms previsto originalmente).
 
 Detalhes estáticos: gradiente de lombada no centro, bordas de papel creme (`#f4ecd8`) com vinheta leve, blocos laterais simulando páginas restantes (espessura proporcional à posição), sombra ambiente do livro sobre a mesa.
 
@@ -117,11 +117,12 @@ Acessibilidade: todos os botões com `aria-label`; indicador de página em `aria
 ## Upload
 
 - `PdfDropzone`: área clicável (abre `<input type="file" accept="application/pdf,.pdf">`) e alvo de drag & drop. Estados: idle, dragover (borda dourada, leve elevação do livro ilustrado), rejeitado (shake curto + mensagem).
+- Desvio documentado: arquivos inválidos (extensão/MIME/assinatura ou tamanho) caem na tela de erro em cheio (`ErrorState`, `role="alert"`), não no shake "rejeitado" da dropzone; o estado `rejeitado` não é usado no MVP.
 - Validação: extensão `.pdf` ou MIME `application/pdf`, mais verificação dos 5 primeiros bytes (`%PDF-`). Tamanho máximo aceito para leitura: 500 MB (acima disso, erro amigável). Persistência só até 150 MB.
 
 ## Persistência
 
-- IndexedDB, banco `escrivaninha`, store `books`, chave fixa `current`: `{ name, size, pageCount, blob?, savedAt }`. `blob` presente só se `size ≤ 150 MB`.
+- IndexedDB, banco `escrivaninha`, store `books`, chave fixa `current`: `{ name, size, pageCount, blob?, savedAt }`. O conteúdo do arquivo (ArrayBuffer, reconstruído como Blob na leitura) é gravado só se `size ≤ 150 MB`; acima disso guardamos apenas os metadados.
 - localStorage `escrivaninha.reading`: `{ name, size, page, zoom, updatedAt }`. Página e zoom salvos com debounce de 300 ms.
 - Ao abrir um arquivo com mesmo `name + size` do salvo, retoma a página. Arquivo diferente reinicia na página 1.
 - Falhas de IndexedDB (modo privado, cota) são silenciosas: a leitura funciona, só não persiste.

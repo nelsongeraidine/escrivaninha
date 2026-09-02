@@ -14,6 +14,11 @@ export function detectSwipe(
 }
 
 export function useSwipe(ref: RefObject<HTMLElement | null>, onSwipe: (dir: 'left' | 'right') => void): void {
+  // Deps `[ref, onSwipe]`: `onSwipe` vem de um `useCallback` com `[nav]` no
+  // chamador, e `nav` e um objeto novo a cada render do hook de navegacao, entao
+  // os listeners de touch se re-registram a cada render. E barato (um add/remove
+  // de 'touchstart'/'touchend' no elemento) e aceitavel para o MVP; nao vale a
+  // complexidade de um ref para estabilizar. Mesmo racional de `useKeyboardNav.ts`.
   useEffect(() => {
     const el = ref.current;
     if (!el) return;

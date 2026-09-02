@@ -12,7 +12,5 @@ export default defineConfig({
     // globals: false porque cada teste importa explicitamente de vitest;
     // evita poluir o escopo global e mantem o lint honesto.
     globals: false,
-    // Sem arquivos de teste ainda nesta task; nao tratar isso como falha.
-    passWithNoTests: true,
   },
 });
