@@ -1,10 +1,8 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, fireEvent, screen, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { PdfDropzone } from './PdfDropzone';
 
-// vitest roda com globals: false, entao o auto-cleanup do RTL nao registra;
-// desmonta manualmente para nao acumular arvores entre os testes.
-afterEach(cleanup);
+// O afterEach(cleanup) agora vive em src/test/setup.ts, aplicado a toda a suíte.
 
 function pdf(name = 'a.pdf') {
   return new File(['%PDF-'], name, { type: 'application/pdf' });

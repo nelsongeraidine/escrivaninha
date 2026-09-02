@@ -13,6 +13,8 @@ import './styles/base.css';
 import './styles/wood.css';
 import './styles/library.css';
 import './styles/states.css';
+import './styles/book.css';
+import './styles/reader.css';
 import { App } from './app/App';
 
 createRoot(document.getElementById('root')!).render(

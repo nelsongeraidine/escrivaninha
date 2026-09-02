@@ -1,0 +1,12 @@
+.reader {
+  position: relative; height: 100%;
+  display: flex; flex-direction: column;
+  background: radial-gradient(ellipse at 50% 40%, var(--wood-800), var(--wood-900) 75%);
+}
+.reader__back {
+  position: absolute; top: 14px; left: 16px; z-index: 5;
+  padding: 6px 12px; border-radius: 999px;
+  color: var(--gold-300); font-size: 13px;
+  background: rgba(0,0,0,0.35);
+}
+.reader__indicator { text-align: center; color: var(--cream-200); font-size: 13px; margin: 8px 0; }
