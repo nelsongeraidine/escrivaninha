@@ -61,6 +61,21 @@ describe('PageRenderer', () => {
     expect(await a).toBe(await b);
   });
 
+  it('dispose limpa o cache e fecha os bitmaps retidos', async () => {
+    const { backend, pending } = controllableBackend();
+    const cache = new BitmapCache();
+    const r = new PageRenderer(backend, cache, 1);
+    const p = r.request(1, 1, 'visible');
+    await Promise.resolve();
+    const b = bitmap();
+    pending.get(1)!.resolve(b);
+    await p;
+    expect(cache.size).toBe(1);
+    r.dispose();
+    expect(cache.size).toBe(0);
+    expect(b.close).toHaveBeenCalled();
+  });
+
   it('retainOnly cancela pendentes fora da janela', async () => {
     const { backend, pending } = controllableBackend();
     const r = new PageRenderer(backend, new BitmapCache(), 1);

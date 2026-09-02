@@ -76,6 +76,9 @@ export class PageRenderer {
 
   dispose(): void {
     this.retainOnly(new Set());
+    // Além de abortar a fila, fecha os bitmaps já renderizados: sem isso, trocar
+    // de livro deixaria vazar até ~100 MB de ImageBitmaps que ninguém mais usa.
+    this.cache.clear();
   }
 
   private pump(): void {
