@@ -141,3 +141,28 @@
   font-size: 12px; color: var(--cream-200); opacity: 0.6; margin: 4px 0 0;
 }
 .library__lock { flex: none; color: var(--gold-500); opacity: 0.85; }
+
+/* Assinatura discreta: menor e mais apagada que o aviso de privacidade,
+   so o @ ganha a cor dourada no hover. */
+.library__credit {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--cream-200);
+  opacity: 0.4;
+  margin: 2px 0 0;
+}
+.library__credit a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--controls-fade), border-color var(--controls-fade);
+}
+.library__credit a:hover {
+  color: var(--gold-300);
+  border-bottom-color: rgba(226, 201, 138, 0.4);
+}
+.library__credit a:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

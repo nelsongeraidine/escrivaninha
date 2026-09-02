@@ -1,6 +1,6 @@
 # PRD: Escrivaninha
 
-Data de Atualização: 02-09-2026_Versão 0.12
+Data de Atualização: 02-09-2026_Versão 0.13
 
 ## 1. Produto
 
@@ -107,5 +107,6 @@ com as fixtures de 3, 50 e 800 páginas. Roteiro em `docs/validation.md`.
 | 0.10 | 02-09-2026 | MVP completo: biblioteca, leitor em modo livro, virada animada, controles, persistência. |
 | 0.11 | 02-09-2026 | Revisão final: aria-live no indicador, foco revela controles, card "Continuar lendo" confere o livro, prefetch adaptativo ao zoom, testes de useOpenBook, .bat detecta app já aberto. |
 | 0.12 | 02-09-2026 | Refino visual (revisão UI/UX): proporção do livro na tela, papel unificado marfim, madeira de verdade no fundo/mesa, vinco e blocos de página, sombra de contato, sombreado da virada, tipografia do título, controles com ícones SVG e vidro quente, polimento mobile e tela cheia. |
+| 0.13 | 02-09-2026 | Assinatura discreta "feito por @nelsonggeraidine" (link para o Instagram) abaixo do aviso de privacidade na biblioteca. EPUB avaliado e descartado por ora (exigiria segundo motor de renderização e dependência nova). |
 
 Spec técnico detalhado: `docs/superpowers/specs/2026-09-02-escrivaninha-design.md`.

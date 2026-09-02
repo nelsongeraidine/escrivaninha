@@ -37,6 +37,13 @@ export function LibraryView({ onFile, continueInfo }: Props) {
         </svg>
         O documento permanece neste dispositivo e não é enviado a nenhum servidor.
       </p>
+
+      <p className="library__credit">
+        feito por{' '}
+        <a href="https://instagram.com/nelsonggeraidine" target="_blank" rel="noopener noreferrer">
+          @nelsonggeraidine
+        </a>
+      </p>
     </main>
   );
 }
