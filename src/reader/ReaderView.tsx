@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { OpenBook } from '../app/appState';
 import { RendererProvider, useRenderer } from '../pdf/RendererContext';
 import { useBookNavigation } from '../book/useBookNavigation';
@@ -7,6 +7,8 @@ import { pagesToPrefetch } from '../book/spreadLayout';
 import { nextZoom, prevZoom } from '../book/zoomLevels';
 import { useFullscreen } from '../shared/useFullscreen';
 import { useAutoHide } from '../shared/useAutoHide';
+import { useKeyboardNav } from '../shared/useKeyboardNav';
+import { useSwipe } from '../shared/useSwipe';
 import { saveReadingState } from '../persistence/readingState';
 import { Book, type PageMetrics } from './Book';
 import { ReaderControls } from './ReaderControls';
@@ -34,6 +36,21 @@ function ReaderInner({ book, onBack }: Props) {
 
   const onMetrics = useCallback((m: PageMetrics) => setMetrics(m), []);
 
+  // Teclado global: setas/PageUp-Down/Home/End viram página; Esc sai da tela cheia.
+  const handlers = useMemo(() => ({
+    next: nav.next, prev: nav.prev,
+    first: () => nav.goToPage(1), last: () => nav.goToPage(nav.pageCount),
+    exitFullscreen: () => { if (document.fullscreenElement) void document.exitFullscreen(); },
+  }), [nav]);
+  useKeyboardNav(handlers);
+
+  // Swipe horizontal no toque: esquerda avança, direita volta.
+  const onSwipe = useCallback((d: 'left' | 'right') => (d === 'left' ? nav.next() : nav.prev()), [nav]);
+  useSwipe(rootRef, onSwipe);
+
+  // Foca a raiz ao montar para o teclado responder sem um clique prévio.
+  useEffect(() => { rootRef.current?.focus(); }, []);
+
   // Prefetch na escala corrente; cancela o que saiu da janela.
   useEffect(() => {
     if (!metrics) return;
@@ -49,7 +66,7 @@ function ReaderInner({ book, onBack }: Props) {
   }, [book.name, book.size, nav.currentPage, zoom]);
 
   return (
-    <div className="reader" ref={rootRef} onMouseMove={poke} onTouchStart={poke} data-fullscreen={fullscreen}>
+    <div className="reader" ref={rootRef} tabIndex={-1} onMouseMove={poke} onTouchStart={poke} data-fullscreen={fullscreen}>
       <button type="button" className="reader__back" data-visible={visible} onClick={onBack}>← Biblioteca</button>
       <Book nav={nav} pageSize={book.loaded.pageSize} zoom={zoom} onMetrics={onMetrics}
         onClickSide={(s) => (s === 'right' ? nav.next() : nav.prev())} onFlipDone={nav.finishFlip} />
