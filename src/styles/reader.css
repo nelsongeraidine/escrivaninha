@@ -42,6 +42,11 @@
 .reader[data-fullscreen='true'] { background: var(--wood-900); }
 
 @media (max-width: 480px) {
-  .controls { flex-wrap: wrap; justify-content: center; max-width: 92vw; bottom: 10px; }
+  /* Sem `left: 50%`: ancorado nas duas margens, a barra usa a largura toda e
+     quebra em duas linhas em vez de espremer numa coluna de ~50vw. */
+  .controls {
+    left: 4vw; right: 4vw; transform: none;
+    flex-wrap: wrap; justify-content: center; max-width: none; bottom: 10px;
+  }
   .controls__sep { display: none; }
 }

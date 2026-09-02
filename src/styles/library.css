@@ -1,7 +1,9 @@
 .library {
   min-height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  /* Linhas intrínsecas (sem 1fr): em telas altas a dropzone mantém a altura
+     natural e o conjunto fica centrado por align-content, sem caixa vazia embaixo. */
+  grid-template-rows: auto auto auto auto;
   justify-items: center;
   align-content: center;
   gap: 28px;

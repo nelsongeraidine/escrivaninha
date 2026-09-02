@@ -81,7 +81,7 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }
   const progress = nav.pageCount > 1 ? nav.currentPage / nav.pageCount : 0;
 
   return (
-    <div className="book-area" ref={areaRef}>
+    <div className="book-area" ref={areaRef} data-zoom-fit={zoom <= 100 ? '' : undefined}>
       {/* A perspectiva mora aqui, e não em `.book-area`: aquele elemento rola
           (`overflow: auto`) e recortaria a folha 3D ao girar sobre a lombada. */}
       <div className="book-stage">

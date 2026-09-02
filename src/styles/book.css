@@ -3,6 +3,11 @@
   display: grid; place-items: center;
   overflow: auto;
 }
+/* Com zoom <= 100% a página cabe na área: a folha em virada pode transbordar
+   à esquerda do livro por um instante e piscar uma barra horizontal. `clip`
+   corta esse transbordo sem criar barra; o eixo vertical continua rolável.
+   Com zoom > 100% o atributo sai e a rolagem horizontal volta a existir. */
+.book-area[data-zoom-fit] { overflow-x: clip; }
 /* A perspectiva fica neste palco, não em `.book-area`: um contêiner com
    `overflow: auto` recorta a folha 3D quando ela gira sobre a lombada. */
 .book-stage {
