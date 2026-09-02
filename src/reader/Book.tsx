@@ -104,7 +104,20 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone }: Props) {
           </div>
         )}
         <div className="book__spine" aria-hidden="true" />
-        {nav.flip && <Sheet flip={nav.flip} metrics={metrics} mode={nav.mode} onDone={onFlipDone} />}
+        {/* `key` por transição: quando `finishFlip` encadeia um flip na mesma
+            direção, sem a chave o React reusa o mesmo elemento, o `animation-name`
+            não muda e os `@keyframes` não reiniciam (a segunda virada ficaria sem
+            animação, avançando só pelo fallback de 900ms). Remontar dá a cada
+            virada sua própria animação, effect e timer. */}
+        {nav.flip && (
+          <Sheet
+            key={`${nav.flip.from}-${nav.flip.to}`}
+            flip={nav.flip}
+            metrics={metrics}
+            mode={nav.mode}
+            onDone={onFlipDone}
+          />
+        )}
       </div>
       </div>
     </div>

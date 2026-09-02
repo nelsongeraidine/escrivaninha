@@ -14,7 +14,10 @@ interface Props { flip: Flip; metrics: PageMetrics; mode: ViewMode; onDone: () =
 export function Sheet({ flip, metrics, mode, onDone }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const done = useRef(onDone);
-  done.current = onDone;
+  // Guardamos a callback num ref para o effect abaixo não depender dela: assim o
+  // listener/timer são montados uma vez por flip. A escrita fica num effect (e
+  // não no corpo do render) para nao acessar `.current` durante a renderização.
+  useEffect(() => { done.current = onDone; });
 
   useEffect(() => {
     const el = ref.current;
