@@ -6,7 +6,7 @@ import { ReaderView } from '../reader/ReaderView';
 import { LoadingState } from '../reader/LoadingState';
 import { ErrorState } from '../reader/ErrorState';
 import { loadCurrentBook, type StoredBook } from '../persistence/bookStore';
-import { loadReadingState } from '../persistence/readingState';
+import { loadReadingState, matchesFile } from '../persistence/readingState';
 
 export function App() {
   const [state, dispatch] = useReducer(appReducer, initialState);
@@ -20,10 +20,12 @@ export function App() {
 
   if (state.status === 'library') {
     const saved = loadReadingState();
+    // So mostra a pagina salva se o estado do localStorage for do mesmo arquivo
+    // (nome + tamanho); caso contrario o card mostraria a pagina de outro livro.
     const continueInfo = book
-      ? { name: book.name, page: saved?.page ?? 1, pageCount: book.loaded.pageCount, onContinue: () => dispatch({ type: 'resume' }) }
+      ? { name: book.name, page: matchesFile(saved, book) ? saved!.page : 1, pageCount: book.loaded.pageCount, onContinue: () => dispatch({ type: 'resume' }) }
       : stored?.blob
-        ? { name: stored.name, page: saved?.page ?? 1, pageCount: stored.pageCount, onContinue: () => { void openStored(); } }
+        ? { name: stored.name, page: matchesFile(saved, stored) ? saved!.page : 1, pageCount: stored.pageCount, onContinue: () => { void openStored(); } }
         : undefined;
     return <LibraryView onFile={(f) => { void openFile(f); }} continueInfo={continueInfo} />;
   }
