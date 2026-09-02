@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Data de Atualização: 02-09-2026_Versão 0.01
+Data de Atualização: 02-09-2026_Versão 0.10
 
 ## Visão geral
 
@@ -18,7 +18,7 @@ Stack: Vite 8 + React 19 + TypeScript strict, `pdfjs-dist` 6 (worker via `?url`,
 - `src/library/`: tela inicial, dropzone, card "Continuar lendo".
 - `src/reader/`: ReaderView, Book/Sheet/Page, controles, loading e erro.
 - `src/pdf/`: carga do documento, fila de render (concorrência 2, cancelável), cache LRU de `ImageBitmap` (24 entradas / ~100 MB), prefetch ±4 páginas.
-- `src/book/`: `spreadLayout.ts` (funções puras página↔sheet↔spread: spread 0 = capa sozinha; spread k = (2k, 2k+1); sheet k = frente 2k+1 / verso 2k+2), navegação, animação de virada (WAAPI anima `--flip-progress`; CSS faz luz e sombra).
+- `src/book/`: `spreadLayout.ts` (funções puras página↔sheet↔spread: spread 0 = capa sozinha; spread k = (2k, 2k+1); sheet k = frente 2k+1 / verso 2k+2), navegação, animação de virada em CSS 3D (`@keyframes` com `animationend` e fallback por timer; luz e sombra sincronizadas na mesma folha).
 - `src/persistence/`: IndexedDB (`escrivaninha/books`, Blob até 150 MB) e localStorage (página, zoom).
 - `src/shared/`: fullscreen, teclado, swipe, media query, mapeamento de erros.
 
@@ -56,8 +56,10 @@ npm run build        # build de produção em dist/
 npm run preview      # serve o build
 npm test             # Vitest (todos)
 npx vitest run src/book/spreadLayout.test.ts   # um arquivo
-npm run lint         # ESLint + tsc --noEmit
+npm run lint         # oxlint + tsc -b --noEmit
 node scripts/make-fixtures.mjs   # gera PDFs de teste (3, 50, 800 páginas) em fixtures/
 ```
+
+Usuário final: duplo clique em `Abrir Escrivaninha.bat`.
 
 Pasta está sob sync do OneDrive: evitar builds concorrentes e, se houver lentidão, pausar o sync.

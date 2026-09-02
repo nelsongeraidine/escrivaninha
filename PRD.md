@@ -1,6 +1,6 @@
 # PRD: Escrivaninha
 
-Data de Atualização: 02-09-2026_Versão 0.01
+Data de Atualização: 02-09-2026_Versão 0.10
 
 ## 1. Produto
 
@@ -71,35 +71,39 @@ Referência: biblioteca/escritório clássico; madeira escura, marrons, dourado 
 
 ## 8. Critérios de aceitação
 
-- [ ] Abrir a aplicação.
-- [ ] Arrastar um PDF para a interface.
-- [ ] Selecionar um PDF pelo botão.
-- [ ] O PDF é processado localmente.
-- [ ] O documento aparece como um livro.
-- [ ] Visualizar as páginas.
-- [ ] Virar a página para frente.
-- [ ] Voltar a página.
-- [ ] A animação parece uma página física sendo virada.
-- [ ] Navegar usando teclado.
-- [ ] Navegar usando mouse.
-- [ ] Navegar usando touch no mobile.
-- [ ] Visualizar página atual / total.
-- [ ] Ir diretamente para uma página.
-- [ ] Utilizar zoom.
-- [ ] Utilizar fullscreen.
-- [ ] Voltar para a biblioteca.
-- [ ] Funciona com PDFs grandes.
-- [ ] Interface responsiva.
-- [ ] Visual segue a identidade da referência.
-- [ ] Sem erros no console.
-- [ ] Sem elementos quebrados.
-- [ ] Layout não parece um visualizador de PDF convencional.
-- [ ] A experiência transmite a sensação de "ler um livro".
+- [x] Abrir a aplicação.
+- [x] Arrastar um PDF para a interface.
+- [x] Selecionar um PDF pelo botão.
+- [x] O PDF é processado localmente.
+- [x] O documento aparece como um livro.
+- [x] Visualizar as páginas.
+- [x] Virar a página para frente.
+- [x] Voltar a página.
+- [x] A animação parece uma página física sendo virada.
+- [x] Navegar usando teclado.
+- [x] Navegar usando mouse.
+- [x] Navegar usando touch no mobile.
+- [x] Visualizar página atual / total.
+- [x] Ir diretamente para uma página.
+- [x] Utilizar zoom.
+- [x] Utilizar fullscreen.
+- [x] Voltar para a biblioteca.
+- [x] Funciona com PDFs grandes.
+- [x] Interface responsiva.
+- [x] Visual segue a identidade da referência.
+- [x] Sem erros no console.
+- [x] Sem elementos quebrados.
+- [x] Layout não parece um visualizador de PDF convencional.
+- [x] A experiência transmite a sensação de "ler um livro".
+
+Validação executada no navegador (Playwright MCP) a 1440x900, 1024x768 e 390x844
+com as fixtures de 3, 50 e 800 páginas. Roteiro em `docs/validation.md`.
 
 ## 9. Histórico de versões
 
 | Versão | Data | Alteração |
 |--------|------|-----------|
 | 0.01 | 02-09-2026 | PRD inicial a partir do briefing e do spec de design. |
+| 0.10 | 02-09-2026 | MVP completo: biblioteca, leitor em modo livro, virada animada, controles, persistência. |
 
 Spec técnico detalhado: `docs/superpowers/specs/2026-09-02-escrivaninha-design.md`.
