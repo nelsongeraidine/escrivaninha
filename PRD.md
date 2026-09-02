@@ -1,6 +1,6 @@
 # PRD: Escrivaninha
 
-Data de Atualização: 02-09-2026_Versão 0.10
+Data de Atualização: 02-09-2026_Versão 0.11
 
 ## 1. Produto
 
@@ -105,5 +105,6 @@ com as fixtures de 3, 50 e 800 páginas. Roteiro em `docs/validation.md`.
 |--------|------|-----------|
 | 0.01 | 02-09-2026 | PRD inicial a partir do briefing e do spec de design. |
 | 0.10 | 02-09-2026 | MVP completo: biblioteca, leitor em modo livro, virada animada, controles, persistência. |
+| 0.11 | 02-09-2026 | Revisão final: aria-live no indicador, foco revela controles, card "Continuar lendo" confere o livro, prefetch adaptativo ao zoom, testes de useOpenBook, .bat detecta app já aberto. |
 
 Spec técnico detalhado: `docs/superpowers/specs/2026-09-02-escrivaninha-design.md`.

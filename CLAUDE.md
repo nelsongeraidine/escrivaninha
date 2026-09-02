@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Data de Atualização: 02-09-2026_Versão 0.10
+Data de Atualização: 02-09-2026_Versão 0.11
 
 ## Visão geral
 
