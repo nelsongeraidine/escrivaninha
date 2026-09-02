@@ -35,7 +35,8 @@ function ReaderInner({ book, onBack }: Props) {
     <div className="reader">
       <button type="button" className="reader__back" onClick={onBack}>← Biblioteca</button>
       <Book nav={nav} pageSize={book.loaded.pageSize} zoom={zoom}
-        onClickSide={(s) => (s === 'right' ? nav.next() : nav.prev())} />
+        onClickSide={(s) => (s === 'right' ? nav.next() : nav.prev())}
+        onFlipDone={nav.finishFlip} />
       <p className="reader__indicator" aria-live="polite">Página {nav.currentPage} / {nav.pageCount}</p>
     </div>
   );

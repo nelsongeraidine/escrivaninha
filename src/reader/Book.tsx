@@ -1,15 +1,16 @@
-import { useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { pagesInSpread } from '../book/spreadLayout';
 import type { BookNavigation } from '../book/useBookNavigation';
 import { Page } from './Page';
+import { Sheet } from './Sheet';
 
 interface Props {
   nav: BookNavigation;
   pageSize: { width: number; height: number };
   zoom: number;
   onClickSide?: (side: 'left' | 'right') => void;
-  /** Sheet em animação, injetada pela Task 11. */
-  children?: ReactNode;
+  /** Encerra o flip quando a animação da folha termina. */
+  onFlipDone: () => void;
 }
 
 export interface PageMetrics { cssWidth: number; cssHeight: number; scale: number }
@@ -50,7 +51,7 @@ export function usePageMetrics(
   }, [area.w, area.h, pageSize.width, pageSize.height, mode, zoom]);
 }
 
-export function Book({ nav, pageSize, zoom, onClickSide, children }: Props) {
+export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone }: Props) {
   const areaRef = useRef<HTMLDivElement>(null);
   const metrics = usePageMetrics(areaRef, pageSize, nav.mode, zoom);
   const spread = pagesInSpread(nav.spreadIndex, nav.mode, nav.pageCount);
@@ -75,6 +76,9 @@ export function Book({ nav, pageSize, zoom, onClickSide, children }: Props) {
 
   return (
     <div className="book-area" ref={areaRef}>
+      {/* A perspectiva mora aqui, e não em `.book-area`: aquele elemento rola
+          (`overflow: auto`) e recortaria a folha 3D ao girar sobre a lombada. */}
+      <div className="book-stage">
       <div
         className={`book book--${nav.mode}`}
         style={{ ['--page-w' as string]: `${metrics.cssWidth}px`, ['--page-h' as string]: `${metrics.cssHeight}px`, ['--progress' as string]: progress }}
@@ -100,7 +104,8 @@ export function Book({ nav, pageSize, zoom, onClickSide, children }: Props) {
           </div>
         )}
         <div className="book__spine" aria-hidden="true" />
-        {children}
+        {nav.flip && <Sheet flip={nav.flip} metrics={metrics} mode={nav.mode} onDone={onFlipDone} />}
+      </div>
       </div>
     </div>
   );

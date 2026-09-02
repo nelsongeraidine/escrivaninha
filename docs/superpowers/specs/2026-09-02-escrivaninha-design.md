@@ -83,7 +83,7 @@ Ao trocar de modo (rotacionar o celular, redimensionar), a página atual é pres
 - Container do livro com `perspective: 2400px`.
 - Só a sheet em movimento vira; front e back com `backface-visibility: hidden`, `transform-origin` na lombada (spread) ou na borda externa (single).
 - Avançar: `rotateY(0 → -180deg)`; voltar: `rotateY(-180 → 0)` da sheet anterior. Duração 650 ms, easing `cubic-bezier(0.4, 0, 0.2, 1)`.
-- Web Animations API anima a custom property `--flip-progress` (0 a 1) junto com o transform; CSS usa a propriedade para: gradiente de luz sobre a sheet (escurece perto de 0.5), sombra projetada na página estática de baixo, leve `scaleX` da sombra.
+- A virada usa `@keyframes` CSS (transform da folha e opacidade das camadas de luz/sombra) e o React espera `animationend` para confirmar o novo spread.
 - Durante a animação, entradas de navegação são enfileiradas (no máximo 1 pendente) para não quebrar o estado; ao terminar, o estado lógico avança e a sheet volta a ser DOM estático.
 - `prefers-reduced-motion`: troca instantânea com fade de 150 ms.
 
