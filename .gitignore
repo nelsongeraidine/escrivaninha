@@ -25,3 +25,12 @@ dist-ssr
 
 # Artefatos de planejamento SDD: nao versionar neste repo.
 .superpowers/
+
+# Sessoes do Playwright MCP (screenshots, logs, PDFs de teste): nunca versionar.
+.playwright-mcp/
+
+# Fixtures de PDF geradas por scripts/make-fixtures.mjs.
+fixtures/*.pdf
+
+# Screenshots avulsas de validacao.
+/*.png
