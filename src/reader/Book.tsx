@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { pagesInSpread } from '../book/spreadLayout';
 import type { BookNavigation } from '../book/useBookNavigation';
 import { Page } from './Page';
@@ -11,6 +11,8 @@ interface Props {
   onClickSide?: (side: 'left' | 'right') => void;
   /** Encerra o flip quando a animação da folha termina. */
   onFlipDone: () => void;
+  /** Reporta a métrica de página corrente (o prefetch do leitor pede na escala real). */
+  onMetrics?: (m: PageMetrics) => void;
 }
 
 export interface PageMetrics { cssWidth: number; cssHeight: number; scale: number }
@@ -51,9 +53,13 @@ export function usePageMetrics(
   }, [area.w, area.h, pageSize.width, pageSize.height, mode, zoom]);
 }
 
-export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone }: Props) {
+export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }: Props) {
   const areaRef = useRef<HTMLDivElement>(null);
   const metrics = usePageMetrics(areaRef, pageSize, nav.mode, zoom);
+
+  // `metrics` é memoizado em `usePageMetrics`, então este effect só roda quando
+  // uma métrica muda de fato; `onMetrics` vem estável por `useCallback` no pai.
+  useEffect(() => { onMetrics?.(metrics); }, [metrics, onMetrics]);
   const spread = pagesInSpread(nav.spreadIndex, nav.mode, nav.pageCount);
 
   // Durante um flip a base mostra o que fica parado: esquerda do spread menor
