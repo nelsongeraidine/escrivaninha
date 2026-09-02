@@ -5,7 +5,9 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 function makePdf(pageCount) {
   const objects = [];
   const add = (body) => { objects.push(body); return objects.length; };
-  const fontId = add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  // WinAnsiEncoding: sem isso a Helvetica base-14 usa StandardEncoding e o octal
+  // \341 vira a ligadura "Æ" em vez de "á" (renderizava "PÆgina N").
+  const fontId = add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
   const pageIds = [];
   const pagesId = objects.length + 1 + pageCount * 2; // reservado depois dos conteúdos
   for (let i = 1; i <= pageCount; i++) {
