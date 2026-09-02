@@ -24,6 +24,12 @@ describe('appReducer', () => {
     s = appReducer(s, { type: 'resume' });
     expect(s).toEqual({ status: 'reading', book });
   });
+  it('falha ao abrir novo arquivo preserva o livro passado na ação', () => {
+    let s = appReducer({ status: 'loading', name: 'b', progress: 0 }, { type: 'open-failure', message: 'msg', book });
+    expect(s).toEqual({ status: 'error', message: 'msg', book });
+    s = appReducer(s, { type: 'dismiss-error' });
+    expect(s).toEqual({ status: 'library', book });
+  });
   it('resume sem livro não muda nada', () => {
     expect(appReducer(initialState, { type: 'resume' })).toEqual(initialState);
   });

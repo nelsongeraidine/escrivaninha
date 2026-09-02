@@ -19,7 +19,7 @@ export type AppAction =
   | { type: 'open-start'; name: string }
   | { type: 'open-progress'; progress: number }
   | { type: 'open-success'; book: OpenBook }
-  | { type: 'open-failure'; message: string }
+  | { type: 'open-failure'; message: string; book?: OpenBook }
   | { type: 'resume' }
   | { type: 'back-to-library' }
   | { type: 'dismiss-error' };
@@ -37,7 +37,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'open-success':
       return { status: 'reading', book: action.book };
     case 'open-failure':
-      return { status: 'error', message: action.message, book: bookOf(state) };
+      return { status: 'error', message: action.message, book: action.book ?? bookOf(state) };
     case 'resume':
       return state.status === 'library' && state.book ? { status: 'reading', book: state.book } : state;
     case 'back-to-library':
@@ -47,8 +47,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
   }
 }
 
-// Preserva o livro atual ao entrar em erro para que a tela de falha ainda
-// ofereça "voltar para o livro" quando a abertura de um novo arquivo falha.
+// Extrai o livro do estado atual quando a ação de falha não carrega um livro
+// explícito. Serve de fallback para transições internas (ex.: falha sem `current`);
+// o caminho normal de abertura passa `action.book` para não perder o livro aberto.
 function bookOf(state: AppState): OpenBook | undefined {
   return state.status === 'reading' || state.status === 'library' || state.status === 'error' ? state.book : undefined;
 }
