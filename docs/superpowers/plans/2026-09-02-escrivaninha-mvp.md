@@ -3285,11 +3285,43 @@ Executar cada item; para cada falha, corrigir no módulo responsável, rodar `np
 
 Comparar screenshots com a referência: hierarquia do título, contraste dourado/creme, dropzone sem cara de card de SaaS, livro com sombra e lombada. Ajustar tokens/CSS se necessário, commitar `style(...)`.
 
-- [ ] **Step 5: Versão e documentação**
+- [ ] **Step 5: Atalho para usuário leigo**
+
+`Abrir Escrivaninha.bat` na raiz (encoding ANSI/CP1252 para o `cmd` exibir acentos; sem acentos no conteúdo para não depender disso):
+```bat
+@echo off
+title Escrivaninha
+cd /d "%~dp0"
+
+where node >nul 2>nul
+if errorlevel 1 (
+  echo Node.js nao encontrado. Instale em https://nodejs.org e tente de novo.
+  pause
+  exit /b 1
+)
+
+if not exist "node_modules\" (
+  echo Preparando a Escrivaninha pela primeira vez, aguarde...
+  call npm install
+  if errorlevel 1 (
+    echo Falha ao instalar. Verifique a conexao e tente de novo.
+    pause
+    exit /b 1
+  )
+)
+
+echo Abrindo a Escrivaninha... Feche esta janela para encerrar.
+start "" "http://localhost:5173"
+call npm run dev -- --port 5173 --strictPort
+pause
+```
+Testar: duplo clique abre o navegador e o app; fechar a janela encerra o servidor. Adicionar em `CLAUDE.md` > "Como rodar": "Usuário final: duplo clique em `Abrir Escrivaninha.bat`."
+
+- [ ] **Step 6: Versão e documentação**
 
 Atualizar `CLAUDE.md` e `PRD.md`: `Data de Atualização: <DD-MM-YYYY>_Versão 0.10`; linha no histórico do PRD: "0.10 | data | MVP completo: biblioteca, leitor em modo livro, virada animada, controles, persistência". Marcar os critérios de aceitação verificados com `[x]`.
 
-- [ ] **Step 6: Build final e commit**
+- [ ] **Step 7: Build final e commit**
 
 ```bash
 npm run build && npm test && npm run lint
