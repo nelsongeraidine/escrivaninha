@@ -1,0 +1,21 @@
+:root {
+  --wood-900: #1a110b;
+  --wood-800: #2a1a10;
+  --wood-700: #3d2617;
+  --wood-600: #5a3a24;
+  --gold-500: #c9a45c;
+  --gold-300: #e2c98a;
+  --cream-100: #f4ecd8;
+  --cream-200: #e9dfc6;
+  --bordeaux-600: #6e1f23;
+  --ink-900: #1c1410;
+
+  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --ease-page: cubic-bezier(0.4, 0, 0.2, 1);
+  --flip-duration: 650ms;
+  --controls-fade: 220ms;
+
+  --shadow-book: 0 30px 60px rgba(0, 0, 0, 0.55), 0 8px 18px rgba(0, 0, 0, 0.35);
+}
