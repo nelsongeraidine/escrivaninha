@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   clampPage, spreadCount, spreadForPage, pagesInSpread,
-  firstPageOfSpread, pagesToPrefetch, sheetForTransition,
+  firstPageOfSpread, pagesToPrefetch, prefetchRadiusFor, sheetForTransition,
 } from './spreadLayout';
 
 describe('modo spread', () => {
@@ -63,6 +63,23 @@ describe('utilitários', () => {
     expect(pagesToPrefetch(0, 'spread', 10, 4)).toEqual([1, 2, 3, 4, 5]);
     expect(pagesToPrefetch(5, 'spread', 10, 4)).toEqual([10, 9, 8, 7, 6]);
     expect(pagesToPrefetch(2, 'single', 3, 4)).toEqual([3, 2, 1]);
+  });
+  it('prefetchRadiusFor degrada o raio conforme o custo por bitmap', () => {
+    // Bitmap barato (~4 MB): raio cheio.
+    expect(prefetchRadiusFor(4 * 1024 * 1024)).toBe(4);
+    // Custo médio (16 MB): raio 2.
+    expect(prefetchRadiusFor(16 * 1024 * 1024)).toBe(2);
+    // Retina + zoom alto (32 MB): raio mínimo para não estourar os ~100 MB.
+    expect(prefetchRadiusFor(32 * 1024 * 1024)).toBe(1);
+  });
+  it('prefetchRadiusFor usa limites exatos (12 MB e 24 MB)', () => {
+    expect(prefetchRadiusFor(12 * 1024 * 1024)).toBe(4);
+    expect(prefetchRadiusFor(12 * 1024 * 1024 + 1)).toBe(2);
+    expect(prefetchRadiusFor(24 * 1024 * 1024)).toBe(2);
+    expect(prefetchRadiusFor(24 * 1024 * 1024 + 1)).toBe(1);
+  });
+  it('prefetchRadiusFor trata custo zero como raio cheio', () => {
+    expect(prefetchRadiusFor(0)).toBe(4);
   });
   it('troca de modo preserva a página', () => {
     const page = 7;

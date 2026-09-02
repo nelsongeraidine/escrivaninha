@@ -59,6 +59,19 @@ export function pagesToPrefetch(index: number, mode: ViewMode, total: number, ra
   return [...visible, ...after, ...before];
 }
 
+/**
+ * Raio de prefetch (em paginas para cada lado) conforme o custo de um bitmap.
+ * O cache de ImageBitmap tem orcamento de ~100 MB; em tela retina com zoom alto
+ * cada pagina passa de 20 MB e um raio fixo de 4 faria o cache girar (thrash),
+ * chegando a evictar o proprio spread visivel. Degrada o raio para caber no
+ * orcamento sem perder a pre-carga das paginas mais provaveis.
+ */
+export function prefetchRadiusFor(bytesPerBitmap: number): number {
+  if (bytesPerBitmap > 24 * 1024 * 1024) return 1;
+  if (bytesPerBitmap > 12 * 1024 * 1024) return 2;
+  return 4;
+}
+
 export function sheetForTransition(
   from: number, to: number, mode: ViewMode, total: number,
 ): { front?: number; back?: number; direction: FlipDirection } {

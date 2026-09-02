@@ -49,7 +49,10 @@ export function PageIndicator({ page, pageCount, onGoTo }: Props) {
   }
   return (
     <button type="button" className="indicator" onClick={() => setEditing(true)} aria-label={`Página ${page} de ${pageCount}. Ir para uma página`}>
-      Página {page} / {pageCount}
+      {/* `aria-live="polite"` no texto visível: o leitor de tela anuncia a nova
+          página ao virar sem roubar o foco. Fica dentro do botão para o
+          `aria-label` continuar sendo o nome acessível do controle. */}
+      <span aria-live="polite">Página {page} / {pageCount}</span>
     </button>
   );
 }

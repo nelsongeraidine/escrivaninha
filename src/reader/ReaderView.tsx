@@ -3,7 +3,7 @@ import type { OpenBook } from '../app/appState';
 import { RendererProvider, useRenderer } from '../pdf/RendererContext';
 import { useBookNavigation } from '../book/useBookNavigation';
 import { useViewMode, usePrefersReducedMotion } from '../shared/useMediaQuery';
-import { pagesToPrefetch } from '../book/spreadLayout';
+import { pagesInSpread, pagesToPrefetch, prefetchRadiusFor } from '../book/spreadLayout';
 import { nextZoom, prevZoom } from '../book/zoomLevels';
 import { useFullscreen } from '../shared/useFullscreen';
 import { useAutoHide } from '../shared/useAutoHide';
@@ -36,6 +36,12 @@ function ReaderInner({ book, onBack }: Props) {
 
   const onMetrics = useCallback((m: PageMetrics) => setMetrics(m), []);
 
+  // Ultima pagina de fato visivel no spread: base para desabilitar "Proxima".
+  const currentSpread = pagesInSpread(nav.spreadIndex, nav.mode, nav.pageCount);
+  const lastVisiblePage = currentSpread.kind === 'single'
+    ? currentSpread.page
+    : currentSpread.right ?? currentSpread.left ?? nav.currentPage;
+
   // Teclado global: setas/PageUp-Down/Home/End viram página; Esc sai da tela cheia.
   const handlers = useMemo(() => ({
     next: nav.next, prev: nav.prev,
@@ -54,10 +60,15 @@ function ReaderInner({ book, onBack }: Props) {
   // Prefetch na escala corrente; cancela o que saiu da janela.
   useEffect(() => {
     if (!metrics) return;
-    const pages = pagesToPrefetch(nav.spreadIndex, nav.mode, nav.pageCount, 4);
+    // Estima o custo de um bitmap nesta escala (px fisicos x 4 bytes RGBA) para
+    // encolher o raio quando o orcamento de ~100 MB do cache nao comporta 4
+    // paginas; em retina + zoom alto um raio fixo evictaria o spread visivel.
+    const px = book.loaded.pageSize.width * metrics.scale * book.loaded.pageSize.height * metrics.scale * 4;
+    const radius = prefetchRadiusFor(px);
+    const pages = pagesToPrefetch(nav.spreadIndex, nav.mode, nav.pageCount, radius);
     renderer.retainOnly(new Set(pages));
     for (const p of pages) renderer.request(p, metrics.scale, 'prefetch').catch(() => undefined);
-  }, [renderer, nav.spreadIndex, nav.mode, nav.pageCount, metrics]);
+  }, [renderer, nav.spreadIndex, nav.mode, nav.pageCount, metrics, book.loaded.pageSize.width, book.loaded.pageSize.height]);
 
   // Persistência com debounce: virar 10 páginas rápido gera 1 escrita.
   useEffect(() => {
@@ -66,14 +77,20 @@ function ReaderInner({ book, onBack }: Props) {
   }, [book.name, book.size, nav.currentPage, zoom]);
 
   return (
-    <div className="reader" ref={rootRef} tabIndex={-1} onMouseMove={poke} onTouchStart={poke} data-fullscreen={fullscreen}>
-      <button type="button" className="reader__back" data-visible={visible} onClick={onBack}>← Biblioteca</button>
+    <div className="reader" ref={rootRef} tabIndex={-1} onMouseMove={poke} onTouchStart={poke} onFocusCapture={poke} data-fullscreen={fullscreen}>
+      {/* `onFocusCapture={poke}` revela a barra e o botão quando o foco chega via
+          Tab: sem isso o `← Biblioteca` fica focável mesmo invisível
+          (`data-visible='false'` só zera opacity/pointer-events). O `onFocus`/
+          `onBlur` no botão usa o mesmo `hold` dos controles para não sumir
+          enquanto ele tem o foco do teclado. */}
+      <button type="button" className="reader__back" data-visible={visible} onClick={onBack}
+        onFocus={() => hold(true)} onBlur={() => hold(false)}>← Biblioteca</button>
       <Book nav={nav} pageSize={book.loaded.pageSize} zoom={zoom} onMetrics={onMetrics}
         onClickSide={(s) => (s === 'right' ? nav.next() : nav.prev())} onFlipDone={nav.finishFlip} />
       <div onMouseEnter={() => hold(true)} onMouseLeave={() => hold(false)} onFocus={() => hold(true)} onBlur={() => hold(false)}>
         <ReaderControls
           visible={visible}
-          page={nav.currentPage} pageCount={nav.pageCount} zoom={zoom} fullscreen={fullscreen}
+          page={nav.currentPage} pageCount={nav.pageCount} lastVisiblePage={lastVisiblePage} zoom={zoom} fullscreen={fullscreen}
           onPrev={nav.prev} onNext={nav.next} onGoTo={nav.goToPage}
           onZoomIn={() => setZoom((z) => nextZoom(z))} onZoomOut={() => setZoom((z) => prevZoom(z))}
           onToggleFullscreen={toggleFullscreen}
