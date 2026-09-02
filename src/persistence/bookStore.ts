@@ -35,16 +35,48 @@ function openDb(): Promise<IDBDatabase> {
 
 function withStore<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => IDBRequest<T>): Promise<T> {
   return openDb().then((db) => new Promise<T>((resolve, reject) => {
-    const tx = db.transaction(STORE, mode);
-    const req = fn(tx.objectStore(STORE));
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-    tx.oncomplete = () => db.close();
+    let completed = false;
+    const closeDb = () => {
+      if (!completed) {
+        completed = true;
+        db.close();
+      }
+    };
+    try {
+      const tx = db.transaction(STORE, mode);
+      const req = fn(tx.objectStore(STORE));
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => {
+        closeDb();
+        reject(req.error);
+      };
+      tx.onerror = () => {
+        closeDb();
+        reject(tx.error);
+      };
+      tx.onabort = () => {
+        closeDb();
+        reject(new Error('Transaction aborted'));
+      };
+      tx.oncomplete = () => {
+        closeDb();
+      };
+    } catch (e) {
+      closeDb();
+      reject(e);
+    }
   }));
 }
 
-async function blobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
-  return blob.arrayBuffer();
+function isStoredBookRecord(v: unknown): v is StoredBookRecord {
+  if (typeof v !== 'object' || v === null) return false;
+  const o = v as Record<string, unknown>;
+  // fake-indexeddb pode não preservar instanceof ArrayBuffer, então checamos se é "tipo de dados".
+  const isBlobData = (val: unknown) => val === undefined || (typeof val === 'object' && val !== null && typeof (val as { byteLength?: unknown }).byteLength === 'number');
+  return typeof o.name === 'string' && typeof o.size === 'number'
+    && typeof o.pageCount === 'number' && typeof o.savedAt === 'number'
+    && isBlobData(o.blobData)
+    && (o.blobType === undefined || typeof o.blobType === 'string');
 }
 
 export async function saveCurrentBook(book: Omit<StoredBook, 'savedAt'>): Promise<void> {
@@ -54,7 +86,9 @@ export async function saveCurrentBook(book: Omit<StoredBook, 'savedAt'>): Promis
     let blobData: ArrayBuffer | undefined;
     let blobType: string | undefined;
     if (book.size <= MAX_PERSIST_BYTES && book.blob) {
-      blobData = await blobToArrayBuffer(book.blob);
+      // blob.arrayBuffer() puxa até 150 MB em memória transitoriamente (arquivo + Blob ambos held).
+      // Por isso o branch acima-teto deliberadamente nunca toca o blob.
+      blobData = await book.blob.arrayBuffer();
       blobType = book.blob.type;
     }
 
@@ -74,8 +108,9 @@ export async function saveCurrentBook(book: Omit<StoredBook, 'savedAt'>): Promis
 
 export async function loadCurrentBook(): Promise<StoredBook | null> {
   try {
-    const r = await withStore<StoredBookRecord | undefined>('readonly', (s) => s.get(CURRENT_KEY));
+    const r = await withStore<unknown>('readonly', (s) => s.get(CURRENT_KEY));
     if (!r) return null;
+    if (!isStoredBookRecord(r)) return null;
 
     let blob: Blob | undefined;
     if (r.blobData) {
