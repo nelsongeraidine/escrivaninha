@@ -2,6 +2,8 @@ import { useEffect, useReducer, useState } from 'react';
 import { appReducer, initialState } from './appState';
 import { useOpenBook } from './useOpenBook';
 import { LibraryView } from '../library/LibraryView';
+import { LoadingState } from '../reader/LoadingState';
+import { ErrorState } from '../reader/ErrorState';
 import { loadCurrentBook, type StoredBook } from '../persistence/bookStore';
 import { loadReadingState } from '../persistence/readingState';
 
@@ -24,7 +26,7 @@ export function App() {
         : undefined;
     return <LibraryView onFile={(f) => { void openFile(f); }} continueInfo={continueInfo} />;
   }
-  if (state.status === 'loading') return <p>Preparando seu livro...</p>;
-  if (state.status === 'error') return <p role="alert">{state.message}</p>;
+  if (state.status === 'loading') return <LoadingState name={state.name} progress={state.progress} />;
+  if (state.status === 'error') return <ErrorState message={state.message} onBack={() => dispatch({ type: 'dismiss-error' })} />;
   return <p>Lendo {state.book.name} ({state.book.loaded.pageCount} páginas)</p>;
 }

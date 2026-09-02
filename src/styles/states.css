@@ -1,0 +1,88 @@
+.state {
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 24px;
+}
+
+.state__title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--cream-100);
+  margin: 0;
+}
+
+.state__detail {
+  font-size: 13px;
+  color: var(--cream-200);
+  opacity: 0.7;
+  margin: 0;
+}
+
+.state__progress {
+  width: 220px;
+  height: 2px;
+  background: rgba(201, 164, 92, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.state__progress > span {
+  display: block;
+  height: 100%;
+  background: var(--gold-500);
+  transition: width 200ms linear;
+}
+
+/* Livro abrindo: capa fixa, duas "páginas" virando em loop com perspectiva. */
+.opening-book {
+  position: relative;
+  width: 120px;
+  height: 84px;
+  perspective: 600px;
+  margin-bottom: 8px;
+}
+
+.opening-book__cover,
+.opening-book__page {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 56px;
+  height: 84px;
+  transform-origin: left center;
+  border-radius: 0 4px 4px 0;
+}
+
+.opening-book__cover {
+  background: var(--bordeaux-600);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+.opening-book__page {
+  background: var(--cream-100);
+  animation: page-loop 1.6s var(--ease-page) infinite;
+}
+
+.opening-book__page--2 {
+  animation-delay: 0.8s;
+}
+
+@keyframes page-loop {
+  0% {
+    transform: rotateY(0deg);
+  }
+  60%,
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening-book__page {
+    animation: none;
+  }
+}
