@@ -39,9 +39,18 @@ export function usePageMetrics(
   return useMemo(() => {
     // 100% = página ajustada à área; o zoom multiplica esse ajuste.
     const pagesAcross = mode === 'spread' ? 2 : 1;
-    const margin = 0.92;
+    // Deixa respiro ao redor do livro (mesa) e desconta o "cromo" vertical
+    // (botão Biblioteca no topo, barra de controles embaixo). Sem isso o livro
+    // ocupava a tela inteira e colidia com os controles.
+    const chrome = 140;
+    const widthFrac = 0.9;
+    const heightFrac = mode === 'spread' ? 0.9 : 0.92;
+    const availH = Math.max(area.h - chrome, 200);
     const fit = area.w && area.h
-      ? Math.min((area.w * margin) / (pageSize.width * pagesAcross), (area.h * margin) / pageSize.height)
+      ? Math.min(
+          (area.w * widthFrac) / (pageSize.width * pagesAcross),
+          (availH * heightFrac) / pageSize.height,
+        )
       : 1;
     const cssScale = fit * (zoom / 100);
     const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 3) : 1;

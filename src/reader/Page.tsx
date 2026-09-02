@@ -37,6 +37,9 @@ export function Page({ page, scale, cssWidth, cssHeight, side }: Props) {
       ) : (
         <div className="page__blank" aria-hidden="true" />
       )}
+      {/* Overlay marfim (multiply): iguala o branco do PDF ao tom do papel do
+          verso e escurece de leve as bordas, como folha encadernada. */}
+      {page && <div className="page__paper" aria-hidden="true" />}
       {page && !bitmap && <div className="page__loading" aria-hidden="true" />}
     </div>
   );

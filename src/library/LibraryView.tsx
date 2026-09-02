@@ -30,7 +30,12 @@ export function LibraryView({ onFile, continueInfo }: Props) {
       </div>
 
       <p className="library__privacy">
-        <span aria-hidden="true">🔒</span> O documento permanece neste dispositivo e não é enviado a nenhum servidor.
+        {/* Cadeado em SVG inline: o emoji renderiza inconsistente entre sistemas. */}
+        <svg className="library__lock" width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+        O documento permanece neste dispositivo e não é enviado a nenhum servidor.
       </p>
     </main>
   );

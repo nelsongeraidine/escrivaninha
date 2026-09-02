@@ -1,14 +1,28 @@
 :root {
+  /* Madeira: do quase-preto quente (fundo do leitor) ao mel (tampo iluminado). */
+  --wood-950: #120b06;
   --wood-900: #1a110b;
   --wood-800: #2a1a10;
   --wood-700: #3d2617;
   --wood-600: #5a3a24;
+  --wood-500: #6f4a2e;
+
   --gold-500: #c9a45c;
   --gold-300: #e2c98a;
+  --gold-200: #f0dcaa;
+
   --cream-100: #f4ecd8;
   --cream-200: #e9dfc6;
+  --bordeaux-700: #571a1d;
   --bordeaux-600: #6e1f23;
   --ink-900: #1c1410;
+
+  /* Papel do livro: marfim quente, borda das folhas empilhadas e vale da lombada. */
+  --paper-100: #f6efe0;
+  --paper-200: #efe6d2;
+  --paper-edge-light: #efe6cf;
+  --paper-edge-dark: #d8ccae;
+  --gutter-shadow: rgba(30, 18, 8, 0.42);
 
   --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -17,5 +31,7 @@
   --flip-duration: 650ms;
   --controls-fade: 220ms;
 
-  --shadow-book: 0 30px 60px rgba(0, 0, 0, 0.55), 0 8px 18px rgba(0, 0, 0, 0.35);
+  /* Sombra do livro em duas camadas (contato curto + projeção longa na mesa). */
+  --shadow-book: 0 2px 4px rgba(0, 0, 0, 0.35), 0 26px 55px -12px rgba(0, 0, 0, 0.6);
+  --shadow-glass: 0 14px 34px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }

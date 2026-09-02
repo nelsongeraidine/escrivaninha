@@ -77,7 +77,7 @@ function ReaderInner({ book, onBack }: Props) {
   }, [book.name, book.size, nav.currentPage, zoom]);
 
   return (
-    <div className="reader" ref={rootRef} tabIndex={-1} onMouseMove={poke} onTouchStart={poke} onFocusCapture={poke} data-fullscreen={fullscreen}>
+    <div className="reader wood--desk" ref={rootRef} tabIndex={-1} onMouseMove={poke} onTouchStart={poke} onFocusCapture={poke} data-fullscreen={fullscreen}>
       {/* `onFocusCapture={poke}` revela a barra e o botão quando o foco chega via
           Tab: sem isso o `← Biblioteca` fica focável mesmo invisível
           (`data-visible='false'` só zera opacity/pointer-events). O `onFocus`/

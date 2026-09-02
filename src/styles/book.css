@@ -3,82 +3,141 @@
   display: grid; place-items: center;
   overflow: auto;
 }
-/* Com zoom <= 100% a página cabe na área: a folha em virada pode transbordar
-   à esquerda do livro por um instante e piscar uma barra horizontal. `clip`
-   corta esse transbordo sem criar barra; o eixo vertical continua rolável.
-   Com zoom > 100% o atributo sai e a rolagem horizontal volta a existir. */
+/* Com zoom <= 100% a pagina cabe na area: a folha em virada pode transbordar
+   por um instante e piscar uma barra horizontal. `clip` corta esse transbordo
+   sem criar barra; o eixo vertical continua rolavel. Com zoom > 100% o atributo
+   sai e a rolagem horizontal volta a existir. */
 .book-area[data-zoom-fit] { overflow-x: clip; }
-/* A perspectiva fica neste palco, não em `.book-area`: um contêiner com
-   `overflow: auto` recorta a folha 3D quando ela gira sobre a lombada. */
+
+/* A perspectiva fica neste palco, nao em `.book-area`: aquele elemento rola
+   (`overflow: auto`) e recortaria a folha 3D ao girar sobre a lombada. O padding
+   generoso e o que da "ar" ao redor do livro, como um livro sobre a mesa. */
 .book-stage {
-  perspective: 2400px;
+  perspective: 2600px;
   transform-style: preserve-3d;
   overflow: visible;
-  padding: 24px;
+  padding: clamp(18px, 6vh, 68px) clamp(16px, 5vw, 84px);
 }
+
 .book {
   position: relative;
   display: flex;
   height: var(--page-h);
-  box-shadow: var(--shadow-book);
-  border-radius: 3px;
+  border-radius: 2px 4px 4px 2px;
   transform-style: preserve-3d;
 }
-.book--spread { width: calc(var(--page-w) * 2); }
+.book--spread { width: calc(var(--page-w) * 2); border-radius: 3px; }
 .book--single { width: var(--page-w); }
+
+/* Espessura da capa: uma laje escura arredondada logo atras do miolo, que
+   aparece nas bordas e da volume. translateZ negativo a coloca fisicamente
+   atras das paginas no contexto 3D (z-index nao vale em preserve-3d). */
+.book::before {
+  content: ''; position: absolute; z-index: -1;
+  inset: -4px -9px -11px -6px;
+  border-radius: 3px 8px 8px 3px;
+  background: linear-gradient(180deg, #2b1c14 0%, #1c120c 55%, #130b06 100%);
+  box-shadow: var(--shadow-book);
+  transform: translateZ(-1px);
+}
+.book--single::before { inset: -4px -7px -9px -4px; }
+
+/* Sombra de contato: elipse borrada no tampo, logo abaixo do livro. */
+.book::after {
+  content: ''; position: absolute; pointer-events: none;
+  left: 50%; bottom: -30px; width: 92%; height: 44px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55), transparent 72%);
+  filter: blur(8px);
+}
 
 .book__side { position: relative; width: var(--page-w); height: var(--page-h); }
 
 .page {
   position: relative; overflow: hidden;
-  background: var(--cream-100);
-  /* Papel: leve textura de fibra e vinheta nas bordas externas. */
+  isolation: isolate; /* contem o mix-blend-mode do overlay de papel */
+  background: var(--paper-100);
+  /* Fibra de papel discreta e um realce fino no topo da folha. */
   background-image:
-    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.35), transparent 70%),
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.012) 0 1px, transparent 1px 3px);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 5%),
+    repeating-linear-gradient(0deg, rgba(120, 90, 50, 0.02) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(120, 90, 50, 0.014) 0 1px, transparent 1px 4px);
 }
 .page__canvas { display: block; }
-.page__blank { width: 100%; height: 100%; background: var(--cream-200); }
+
+/* Overlay marfim em multiply: o branco do PDF vira o tom do verso e o texto
+   preto continua preto, unificando os dois lados do livro. O inset escurece
+   levemente as bordas, como papel encadernado. */
+.page__paper {
+  position: absolute; inset: 0; pointer-events: none;
+  background: var(--paper-100);
+  mix-blend-mode: multiply;
+  box-shadow: inset 0 0 34px rgba(66, 42, 18, 0.12);
+}
+
+.page__blank {
+  width: 100%; height: 100%;
+  background: var(--paper-100);
+  box-shadow: inset 0 0 30px rgba(66, 42, 18, 0.1);
+}
 .page__loading {
-  position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  position: absolute; inset: 0; z-index: 3;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;
 }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-/* Sombra da lombada: escurece a borda interna das duas páginas. */
+/* Vale da lombada: escurece a borda interna das paginas com queda larga.
+   z-index 2 mantem a sombra acima do overlay de papel. */
 .page--left::after, .page--right::after {
-  content: ''; position: absolute; top: 0; bottom: 0; width: 10%; pointer-events: none;
+  content: ''; position: absolute; top: 0; bottom: 0; width: 10%;
+  pointer-events: none; z-index: 2;
 }
-.page--left::after { right: 0; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.18)); }
-.page--right::after { left: 0; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.22)); }
+.page--left::after { right: 0; background: linear-gradient(90deg, transparent, var(--gutter-shadow)); }
+.page--right::after { left: 0; background: linear-gradient(270deg, transparent, var(--gutter-shadow)); }
 .page--single::after {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 6%; pointer-events: none;
-  background: linear-gradient(90deg, rgba(0,0,0,0.18), transparent);
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 7%;
+  pointer-events: none; z-index: 2;
+  background: linear-gradient(90deg, var(--gutter-shadow), transparent);
 }
+
+/* Vinco central: sombra fina e simetrica sobre a lombada, so no modo spread. */
 .book__spine {
-  position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px;
-  background: rgba(0,0,0,0.35); pointer-events: none;
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 16px;
+  margin-left: -8px; pointer-events: none; z-index: 3;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.3) 42%, rgba(0, 0, 0, 0.38) 50%, rgba(0, 0, 0, 0.3) 58%, transparent);
 }
 .book--single .book__spine { display: none; }
 
-/* Blocos de páginas restantes: espessura proporcional à posição no livro. */
+/* Blocos de paginas restantes: pilha estreita com canto externo arredondado,
+   topo e base esfumados e sombra propria. A espessura segue --progress. */
 .book__edge {
-  position: absolute; top: 2px; bottom: 2px; width: 14px; pointer-events: none;
-  background: repeating-linear-gradient(180deg, #efe6cf 0 1px, #d9cfb4 1px 2px);
+  position: absolute; top: 3px; bottom: 3px; width: 11px;
+  pointer-events: none; z-index: 1;
+  background: repeating-linear-gradient(180deg, var(--paper-edge-light) 0 1.5px, var(--paper-edge-dark) 1.5px 3px);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 7px, #000 calc(100% - 7px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 7px, #000 calc(100% - 7px), transparent);
 }
-.book__edge--left { right: 100%; transform: scaleX(calc(var(--progress) * 1)); transform-origin: right; }
-.book__edge--right { left: 100%; transform: scaleX(calc(1 - var(--progress))); transform-origin: left; }
+.book__edge--left {
+  right: 100%; border-radius: 3px 0 0 3px;
+  transform: scaleX(var(--progress)); transform-origin: right;
+  box-shadow: -3px 0 8px -3px rgba(0, 0, 0, 0.5);
+}
+.book__edge--right {
+  left: 100%; border-radius: 0 3px 3px 0;
+  transform: scaleX(calc(1 - var(--progress))); transform-origin: left;
+  box-shadow: 3px 0 8px -3px rgba(0, 0, 0, 0.5);
+}
 .book--single .book__edge--left { display: none; }
 
-/* ---- Virada de página ---- */
+/* ---- Virada de pagina ---- */
 .sheet {
   position: absolute; top: 0; left: 50%;
   transform-style: preserve-3d;
   transform-origin: left center;
   will-change: transform;
-  z-index: 3;
+  z-index: 4;
 }
 .book--single .sheet { left: 0; }
 
@@ -89,19 +148,27 @@
   overflow: hidden;
 }
 .sheet__face--back { transform: rotateY(180deg); }
-/* Verso vazio (modo single ou fim do livro): papel em branco. */
-.sheet__face--back .page__blank { background: var(--cream-100); }
+.sheet__face--back .page__blank { background: var(--paper-100); }
 
+/* Curvatura: realce/sombra atravessando a folha, sugerindo que ela verga. */
+.sheet__face::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.14), rgba(255, 255, 255, 0.05) 22%, transparent 46%, transparent 78%, rgba(0, 0, 0, 0.1));
+}
+
+/* Sombreado da virada: escuro concentrado na lombada, pico quando a folha
+   esta de perfil. Sem a antiga faixa de reflexo branco. */
 .sheet__shade {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, rgba(0,0,0,0.35), rgba(0,0,0,0.05) 40%, rgba(255,255,255,0.12) 60%, rgba(0,0,0,0.25));
+  position: absolute; inset: 0; pointer-events: none; z-index: 4;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 58%);
   opacity: 0;
 }
-/* Sombra projetada na página que está por baixo. */
+/* Sombra que a folha erguida projeta na pagina de baixo, acompanhando o giro. */
 .sheet__cast {
-  position: absolute; top: 0; bottom: 0; right: 100%; width: 100%;
+  position: absolute; top: -2%; bottom: -2%; right: 100%; width: 120%;
   pointer-events: none; opacity: 0;
-  background: linear-gradient(270deg, rgba(0,0,0,0.45), transparent 70%);
+  background: linear-gradient(270deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.12) 45%, transparent 78%);
+  filter: blur(2px);
 }
 
 .sheet--forward { animation: flip-forward var(--flip-duration) var(--ease-page) forwards; }
@@ -118,12 +185,11 @@
   0%   { transform: rotateY(-180deg); }
   100% { transform: rotateY(0deg); }
 }
-/* A luz "passa" pela folha: mais escura a meio caminho, quando está de perfil. */
 @keyframes shade {
-  0% { opacity: 0; } 50% { opacity: 0.9; } 100% { opacity: 0; }
+  0% { opacity: 0; } 48% { opacity: 0.85; } 100% { opacity: 0; }
 }
 @keyframes cast {
-  0% { opacity: 0; } 40% { opacity: 0.7; } 100% { opacity: 0; }
+  0% { opacity: 0; } 40% { opacity: 0.6; } 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
