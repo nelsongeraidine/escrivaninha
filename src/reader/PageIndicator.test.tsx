@@ -26,4 +26,28 @@ describe('PageIndicator', () => {
     expect(screen.queryByRole('spinbutton')).toBeNull();
     expect(onGoTo).toHaveBeenCalledTimes(1);
   });
+
+  it('Esc seguido de blur não salva o valor digitado', () => {
+    const onGoTo = vi.fn();
+    render(<PageIndicator page={5} pageCount={50} onGoTo={onGoTo} />);
+    fireEvent.click(screen.getByRole('button'));
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '40' } });
+    fireEvent.keyDown(input, { key: 'Escape' });
+    fireEvent.blur(input);
+    expect(onGoTo).not.toHaveBeenCalled();
+    expect(screen.queryByRole('spinbutton')).toBeNull();
+  });
+
+  it('Enter seguido de blur chama onGoTo uma única vez', () => {
+    const onGoTo = vi.fn();
+    render(<PageIndicator page={1} pageCount={50} onGoTo={onGoTo} />);
+    fireEvent.click(screen.getByRole('button'));
+    const input = screen.getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: '20' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    fireEvent.blur(input);
+    expect(onGoTo).toHaveBeenCalledTimes(1);
+    expect(onGoTo).toHaveBeenCalledWith(20);
+  });
 });
