@@ -29,6 +29,9 @@ dist-ssr
 # Sessoes do Playwright MCP (screenshots, logs, PDFs de teste): nunca versionar.
 .playwright-mcp/
 
+# Snapshots do $impeccable critique: backlog local da ferramenta, nao do produto.
+.impeccable/
+
 # Fixtures de PDF geradas por scripts/make-fixtures.mjs.
 fixtures/*.pdf
 

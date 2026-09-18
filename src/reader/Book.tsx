@@ -62,6 +62,12 @@ export function usePageMetrics(
   }, [area.w, area.h, pageSize.width, pageSize.height, mode, zoom]);
 }
 
+// Faixa morta em torno da lombada (30% da largura do livro, 15% de cada lado):
+// tocar perto do vinco só revela os controles (via onTouchStart no `.reader`),
+// sem virar página. Sem isso, no toque, o próprio gesto de trazer a barra de
+// volta também avançava/voltava a leitura.
+const DEAD_ZONE = 0.15;
+
 export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }: Props) {
   const areaRef = useRef<HTMLDivElement>(null);
   const metrics = usePageMetrics(areaRef, pageSize, nav.mode, zoom);
@@ -103,17 +109,30 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }
         <div className="book__edge book__edge--right" aria-hidden="true" />
         {nav.mode === 'spread' ? (
           <>
-            <div className="book__side book__side--left" onClick={() => onClickSide?.('left')}>
+            <div className="book__side book__side--left" onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              // Lado esquerdo: a lombada fica na borda direita deste elemento.
+              if (r.width && (r.width - (e.clientX - r.left)) / r.width <= DEAD_ZONE) return;
+              onClickSide?.('left');
+            }}>
               <Page page={left} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="left" />
             </div>
-            <div className="book__side book__side--right" onClick={() => onClickSide?.('right')}>
+            <div className="book__side book__side--right" onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              // Lado direito: a lombada fica na borda esquerda deste elemento.
+              if (r.width && (e.clientX - r.left) / r.width <= DEAD_ZONE) return;
+              onClickSide?.('right');
+            }}>
               <Page page={right} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="right" />
             </div>
           </>
         ) : (
           <div className="book__side book__side--single" onClick={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
-            onClickSide?.(e.clientX - r.left < r.width / 2 ? 'left' : 'right');
+            if (!r.width) return;
+            const frac = (e.clientX - r.left) / r.width;
+            if (frac > 0.5 - DEAD_ZONE && frac < 0.5 + DEAD_ZONE) return;
+            onClickSide?.(frac < 0.5 ? 'left' : 'right');
           }}>
             <Page page={single} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="single" />
           </div>

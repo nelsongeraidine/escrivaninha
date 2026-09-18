@@ -1,4 +1,5 @@
-import { PdfDropzone } from './PdfDropzone';
+import { useRef } from 'react';
+import { PdfDropzone, type PdfDropzoneHandle } from './PdfDropzone';
 import { ContinueReadingCard } from './ContinueReadingCard';
 
 interface Props {
@@ -7,6 +8,11 @@ interface Props {
 }
 
 export function LibraryView({ onFile, continueInfo }: Props) {
+  // O pill "Abrir PDF" abaixo aciona o mesmo seletor de arquivo da dropzone em
+  // vez de ter seu próprio `<input>`: dois inputs com o nome acessível idêntico
+  // duplicavam a parada de Tab sem motivo.
+  const dropzoneRef = useRef<PdfDropzoneHandle>(null);
+
   return (
     <main className="library wood">
       <header className="library__header">
@@ -14,18 +20,12 @@ export function LibraryView({ onFile, continueInfo }: Props) {
         <p className="library__subtitle">Sua biblioteca particular</p>
       </header>
 
-      <PdfDropzone onFile={onFile} />
+      <PdfDropzone ref={dropzoneRef} onFile={onFile} />
 
       <div className="library__actions">
-        <label className="button button--primary">
+        <button type="button" className="button button--primary" onClick={() => dropzoneRef.current?.open()}>
           Abrir PDF
-          <input
-            type="file"
-            accept="application/pdf,.pdf"
-            className="visually-hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }}
-          />
-        </label>
+        </button>
         {continueInfo && <ContinueReadingCard {...continueInfo} />}
       </div>
 

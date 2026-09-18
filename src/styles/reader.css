@@ -23,8 +23,10 @@
 }
 .reader__back:hover { background: rgba(24, 16, 9, 0.72); border-color: rgba(201, 164, 92, 0.35); }
 
-/* Auto-ocultar: a barra e o botao de voltar somem juntos quando o mouse para. */
-.reader__back[data-visible='false'], .controls[data-visible='false'] { opacity: 0; pointer-events: none; }
+/* Auto-ocultar: a barra e o botao de voltar somem juntos quando o mouse para.
+   Fantasma em vez de opacity 0: mesmo escondida, a barra deixa um traço fraco
+   dizendo que ela existe ali, em vez de sumir por completo da tela. */
+.reader__back[data-visible='false'], .controls[data-visible='false'] { opacity: 0.14; pointer-events: none; }
 .reader__back, .controls { transition: opacity var(--controls-fade) ease, background var(--controls-fade), border-color var(--controls-fade); }
 
 .controls {

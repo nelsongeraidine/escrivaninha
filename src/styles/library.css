@@ -48,6 +48,12 @@
   border-color: rgba(226, 201, 138, 0.6);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 26px 64px -26px rgba(0, 0, 0, 0.72);
 }
+/* :focus-within porque o controle real e um input de 1x1 escondido dentro do
+   painel; sem isso o anel dourado desenhava nesse pixel em vez do painel inteiro. */
+.dropzone:focus-within {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 3px;
+}
 .dropzone[data-dragging='true'] {
   border-color: var(--gold-300);
   border-style: solid;

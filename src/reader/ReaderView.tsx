@@ -32,7 +32,19 @@ function ReaderInner({ book, onBack }: Props) {
   const [metrics, setMetrics] = useState<PageMetrics | null>(null);
   const renderer = useRenderer();
   const { active: fullscreen, toggle: toggleFullscreen } = useFullscreen(rootRef);
-  const { visible, poke, hold } = useAutoHide(2500);
+
+  // O auto-hide só liga depois da primeira interação real (virar página, zoom
+  // ou tela cheia): chegar no leitor e a barra já sumir sem o usuário ter feito
+  // nada esconde "← Biblioteca" antes de ele aprender que ela existe.
+  const [interacted, setInteracted] = useState(false);
+  const initialPageRef = useRef(book.initialPage);
+  const initialZoomRef = useRef(book.initialZoom);
+  useEffect(() => {
+    if (nav.currentPage !== initialPageRef.current || zoom !== initialZoomRef.current || fullscreen) {
+      setInteracted(true);
+    }
+  }, [nav.currentPage, zoom, fullscreen]);
+  const { visible, poke, hold } = useAutoHide(2500, interacted);
 
   const onMetrics = useCallback((m: PageMetrics) => setMetrics(m), []);
 

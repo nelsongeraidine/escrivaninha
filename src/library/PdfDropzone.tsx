@@ -1,13 +1,19 @@
-import { useId, useRef, useState, type DragEvent, type ChangeEvent } from 'react';
+import { forwardRef, useId, useImperativeHandle, useRef, useState, type DragEvent, type ChangeEvent } from 'react';
 
 interface Props { onFile: (file: File) => void; disabled?: boolean }
 
-export function PdfDropzone({ onFile, disabled }: Props) {
+/** Permite a um botão externo (o pill "Abrir PDF" da biblioteca) abrir o mesmo
+    seletor de arquivo desta dropzone, em vez de duplicar o `<input type="file">`. */
+export interface PdfDropzoneHandle { open: () => void }
+
+export const PdfDropzone = forwardRef<PdfDropzoneHandle, Props>(function PdfDropzone({ onFile, disabled }, ref) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   // dragenter/dragleave disparam para cada filho; o contador evita piscar.
   const depth = useRef(0);
+
+  useImperativeHandle(ref, () => ({ open: () => inputRef.current?.click() }), []);
 
   function hasFiles(e: DragEvent) {
     return Array.from(e.dataTransfer?.types ?? []).includes('Files');
@@ -73,4 +79,4 @@ export function PdfDropzone({ onFile, disabled }: Props) {
       />
     </div>
   );
-}
+});
