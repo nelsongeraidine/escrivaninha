@@ -138,23 +138,30 @@
   transition: border-color var(--controls-fade), background var(--controls-fade);
 }
 .continue:hover { border-color: var(--gold-300); background: rgba(24, 16, 9, 0.6); }
-.continue__label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-300); }
+.continue__label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-300); }
 .continue__name { font-family: var(--font-serif); font-size: 18px; color: var(--cream-100); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .continue__page { font-size: 12px; color: var(--cream-200); opacity: 0.72; }
 
 .library__privacy {
-  display: inline-flex; align-items: center; gap: 7px;
+  display: inline-flex; align-items: flex-start; gap: 7px;
+  /* Sem isso o texto (~76 caracteres) nao quebrava e a linha ia ate quase a
+     borda da viewport no mobile; com max-width ele sempre respeita a mesma
+     margem das outras faixas da tela. */
+  max-width: min(420px, calc(100% - 8px));
   font-size: 12px; color: var(--cream-200); opacity: 0.6; margin: 4px 0 0;
+  text-align: left;
 }
-.library__lock { flex: none; color: var(--gold-500); opacity: 0.85; }
+.library__privacy span { min-width: 0; }
+.library__lock { flex: none; margin-top: 2px; color: var(--gold-500); opacity: 0.85; }
 
 /* Assinatura discreta: menor e mais apagada que o aviso de privacidade,
-   so o @ ganha a cor dourada no hover. */
+   so o @ ganha a cor dourada no hover. Opacidade calibrada para ainda bater o
+   contraste minimo AA (4,5:1) em texto normal, mesmo apagada. */
 .library__credit {
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--cream-200);
-  opacity: 0.4;
+  opacity: 0.55;
   margin: 2px 0 0;
 }
 .library__credit a {

@@ -34,7 +34,7 @@ export function ReaderControls(p: Props) {
   return (
     <div className="controls" data-visible={p.visible ? 'true' : 'false'} role="toolbar" aria-label="Controles de leitura">
       <button type="button" onClick={p.onPrev} aria-label="Página anterior" disabled={p.page <= 1}><ChevronLeft /></button>
-      <PageIndicator page={p.page} pageCount={p.pageCount} onGoTo={p.onGoTo} />
+      <PageIndicator page={p.page} pageCount={p.pageCount} onGoTo={p.onGoTo} lastVisiblePage={p.lastVisiblePage} />
       <button type="button" onClick={p.onNext} aria-label="Próxima página" disabled={p.lastVisiblePage >= p.pageCount}><ChevronRight /></button>
       <span className="controls__sep" aria-hidden="true" />
       <ZoomControls zoom={p.zoom} onZoomIn={p.onZoomIn} onZoomOut={p.onZoomOut} />

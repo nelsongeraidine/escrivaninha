@@ -1,8 +1,13 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 
-interface Props { page: number; pageCount: number; onGoTo: (p: number) => void }
+interface Props {
+  page: number; pageCount: number; onGoTo: (p: number) => void;
+  /** Página direita do spread visível, quando diferente de `page`: mostra
+      "Páginas X-Y" em vez de nomear só a metade esquerda do que está na tela. */
+  lastVisiblePage?: number;
+}
 
-export function PageIndicator({ page, pageCount, onGoTo }: Props) {
+export function PageIndicator({ page, pageCount, onGoTo, lastVisiblePage }: Props) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(String(page));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,12 +52,17 @@ export function PageIndicator({ page, pageCount, onGoTo }: Props) {
       </span>
     );
   }
+  const rangeEnd = lastVisiblePage ?? page;
+  const isRange = rangeEnd !== page;
+  const label = isRange
+    ? `Páginas ${page} a ${rangeEnd} de ${pageCount}. Ir para uma página`
+    : `Página ${page} de ${pageCount}. Ir para uma página`;
   return (
-    <button type="button" className="indicator" onClick={() => setEditing(true)} aria-label={`Página ${page} de ${pageCount}. Ir para uma página`}>
+    <button type="button" className="indicator" onClick={() => setEditing(true)} aria-label={label}>
       {/* `aria-live="polite"` no texto visível: o leitor de tela anuncia a nova
           página ao virar sem roubar o foco. Fica dentro do botão para o
           `aria-label` continuar sendo o nome acessível do controle. */}
-      <span aria-live="polite">Página {page} / {pageCount}</span>
+      <span aria-live="polite">{isRange ? `Páginas ${page}-${rangeEnd} / ${pageCount}` : `Página ${page} / ${pageCount}`}</span>
     </button>
   );
 }

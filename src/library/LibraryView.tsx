@@ -35,7 +35,7 @@ export function LibraryView({ onFile, continueInfo }: Props) {
           <rect x="4.5" y="10.5" width="15" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
           <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
-        O documento permanece neste dispositivo e não é enviado a nenhum servidor.
+        <span>O documento permanece neste dispositivo e não é enviado a nenhum servidor.</span>
       </p>
 
       <p className="library__credit">

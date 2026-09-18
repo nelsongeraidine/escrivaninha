@@ -16,20 +16,20 @@ Convenção: `[ ]` pendente, `[x]` feito. Cada item cita o(s) arquivo(s) afetado
 
 - [ ] **Sem camada de texto do PDF: leitor de tela e busca (Ctrl+F) não funcionam.** Cada página é só um `<canvas role="img" aria-label="Página N">`; sem seleção, sem busca, sem conteúdo legível para tecnologia assistiva. Maior esforço de código do backlog (mexe em `src/pdf/`); único item que é acessibilidade de verdade, não só polimento. Fix: renderizar a camada de texto transparente do pdf.js sobre o canvas; se ficar fora do escopo, declarar isso explicitamente na seção de acessibilidade do PRD. (`src/pdf/`, `src/reader/Page.tsx`)
 
-## Pendente — bug de layout (achado pelo detector, não é só gosto)
+## Feito (bug de layout + observações menores, lote 18-09-2026 v0.16)
 
-- [ ] **Parágrafo encostando na borda direita da tela no mobile.** `body-text-viewport-edge`: um `<p>` de 74 caracteres na biblioteca (provavelmente `.library__privacy` ou `.dropzone__hint`) bate a margem direita (11px) só em 390px de largura. (`src/styles/library.css`)
+- [x] **Parágrafo encostando na borda direita da tela no mobile.** `body-text-viewport-edge`: `.library__privacy` ganhou `max-width` e o texto virou `<span>` para dimensionar certo dentro do flex; margem da borda passou de ~11px para ~15px. (`src/library/LibraryView.tsx`, `src/styles/library.css`)
+- [x] Indicador mostrava "Página 6 / 50" com as páginas 6 e 7 visíveis; agora diz "Páginas 6-7 / 50" (e no aria-label) quando o spread tem duas páginas. (`src/reader/PageIndicator.tsx`, `src/reader/ReaderControls.tsx`)
+- [x] Nome do livro nunca aparecia dentro do leitor; agora mostra no canto superior direito, some/aparece com o resto do chrome. (`src/reader/ReaderView.tsx`, `src/styles/reader.css`)
+- [x] **`.library__credit`** tinha ~3,17:1 de contraste a 11px; opacidade ajustada de 0,4 para 0,55 (~4,9:1, acima do AA de 4,5:1). (`src/styles/library.css`)
+- [x] `.continue__label` ("Continuar lendo") estava a 10px, abaixo do piso de 11px; ajustado para 11px. (`src/styles/library.css`)
+- [x] "← Biblioteca" usava um glifo de seta em texto; agora usa o mesmo conjunto de ícones SVG traçados do resto da barra. (`src/reader/ReaderView.tsx`)
 
-## Pendente — observações menores
+## Pendente — observações menores (ficaram de fora do lote, risco/esforço maior)
 
-- [ ] Indicador mostra "Página 6 / 50" com as páginas 6 e 7 visíveis; devia dizer "Páginas 6-7 de 50". (`src/reader/PageIndicator.tsx`)
 - [ ] Número da página atrasa durante a virada (só atualiza no fim da animação). (`src/reader/Sheet.tsx`, `src/book/useBookNavigation.ts`)
-- [ ] Nome do livro nunca aparece dentro do leitor; a moldura "biblioteca particular" evapora ao entrar no livro. (`src/reader/ReaderView.tsx`)
-- [ ] Salto para página fora do intervalo (input de página) não dá feedback visual do clamp. (`src/reader/PageIndicator.tsx`)
-- [ ] **`.library__credit`** (assinatura "feito por @nelsonggeraidine") mede ~3,17:1 de contraste a 11px, abaixo do AA de 4,5:1 para texto normal. É recente (sessão de 18-09-2026); ajustar opacidade/cor. (`src/styles/library.css`)
-- [ ] `.continue__label` ("Continuar lendo") a 10px, abaixo do piso de 11px para texto funcional. (`src/styles/library.css`)
+- [ ] Salto para página fora do intervalo (input de página) não dá feedback visual do clamp. Avaliado: dar feedback sem arriscar travar o input em estados de foco/blur (já teve bug de dupla-confirmação Enter/Esc nesta área) precisa de mais cuidado que os outros itens do lote. (`src/reader/PageIndicator.tsx`)
 - [ ] Folha em movimento não tem curvatura (lê como cartão, não como papel); pico de sombra em 0,85 escurece bastante a página saindo. (`src/styles/book.css`)
-- [ ] "← Biblioteca" usa um glifo de seta em texto enquanto todo o resto usa o conjunto de ícones SVG traçados. (`src/reader/ReaderView.tsx`)
 - [ ] Sem sumário/TOC, busca ou miniaturas; no livro de 800 páginas o único jeito de chegar na página 600 é o salto numérico. (evolução maior, fora do MVP)
 
 ## Decisão registrada — deixar como está

@@ -15,6 +15,16 @@ import { ReaderControls } from './ReaderControls';
 
 interface Props { book: OpenBook; onBack: () => void }
 
+// Seta em SVG (traçado), consistente com o conjunto de ícones da barra de
+// controles: antes era um glifo "←" de texto, com peso visual diferente.
+function ChevronLeft() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function ReaderView({ book, onBack }: Props) {
   return (
     <RendererProvider book={book}>
@@ -96,7 +106,10 @@ function ReaderInner({ book, onBack }: Props) {
           `onBlur` no botão usa o mesmo `hold` dos controles para não sumir
           enquanto ele tem o foco do teclado. */}
       <button type="button" className="reader__back" data-visible={visible} onClick={onBack}
-        onFocus={() => hold(true)} onBlur={() => hold(false)}>← Biblioteca</button>
+        onFocus={() => hold(true)} onBlur={() => hold(false)}><ChevronLeft /> Biblioteca</button>
+      {/* Nome do livro: some/aparece junto com o resto do chrome. Sem isso a
+          moldura de "biblioteca particular" evapora assim que o livro abre. */}
+      <div className="reader__title" data-visible={visible} aria-hidden="true">{book.name}</div>
       <Book nav={nav} pageSize={book.loaded.pageSize} zoom={zoom} onMetrics={onMetrics}
         onClickSide={(s) => (s === 'right' ? nav.next() : nav.prev())} onFlipDone={nav.finishFlip} />
       <div onMouseEnter={() => hold(true)} onMouseLeave={() => hold(false)} onFocus={() => hold(true)} onBlur={() => hold(false)}>

@@ -22,12 +22,24 @@
   transition: background var(--controls-fade), border-color var(--controls-fade), opacity var(--controls-fade);
 }
 .reader__back:hover { background: rgba(24, 16, 9, 0.72); border-color: rgba(201, 164, 92, 0.35); }
+.reader__back svg { flex: none; }
 
-/* Auto-ocultar: a barra e o botao de voltar somem juntos quando o mouse para.
-   Fantasma em vez de opacity 0: mesmo escondida, a barra deixa um traço fraco
-   dizendo que ela existe ali, em vez de sumir por completo da tela. */
-.reader__back[data-visible='false'], .controls[data-visible='false'] { opacity: 0.14; pointer-events: none; }
-.reader__back, .controls { transition: opacity var(--controls-fade) ease, background var(--controls-fade), border-color var(--controls-fade); }
+/* Nome do livro: mesma altura do botão de voltar, no canto oposto. Discreto
+   (serifa, opacidade reduzida) para não competir com o livro. */
+.reader__title {
+  position: absolute; top: 18px; right: 20px; z-index: 6;
+  max-width: min(40vw, 360px);
+  padding: 8px 4px;
+  font-family: var(--font-serif); font-size: 13px; color: var(--gold-200); opacity: 0.7;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: opacity var(--controls-fade) ease;
+}
+
+/* Auto-ocultar: a barra, o botao de voltar e o nome do livro somem juntos
+   quando o mouse para. Fantasma em vez de opacity 0: mesmo escondida, a barra
+   deixa um traço fraco dizendo que ela existe ali, em vez de sumir por completo. */
+.reader__back[data-visible='false'], .controls[data-visible='false'], .reader__title[data-visible='false'] { opacity: 0.14; pointer-events: none; }
+.reader__back, .controls, .reader__title { transition: opacity var(--controls-fade) ease, background var(--controls-fade), border-color var(--controls-fade); }
 
 .controls {
   position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6;
@@ -66,6 +78,7 @@ button.indicator:hover { background: rgba(201, 164, 92, 0.12); }
 .zoom__value { min-width: 3.4em; text-align: center; font-variant-numeric: tabular-nums; color: var(--cream-100); }
 
 @media (max-width: 480px) {
+  .reader__title { max-width: 34vw; font-size: 12px; }
   .controls {
     left: 50%; right: auto; transform: translateX(-50%);
     flex-wrap: nowrap; gap: 2px; padding: 6px 8px; bottom: 16px;
