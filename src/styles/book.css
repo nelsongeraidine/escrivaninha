@@ -202,14 +202,22 @@
 .sheet__face--back { transform: rotateY(180deg); }
 .sheet__face--back .page__blank { background: var(--paper-100); }
 
-/* Curvatura: realce/sombra atravessando a folha, sugerindo que ela verga. */
+/* Curvatura: realce/sombra atravessando a folha, sugerindo que ela verga.
+   Opacidade animada (keyframe `curl`) em vez de fixa: o realce se intensifica
+   quando a folha está de perfil, como luz pegando o vinco de uma página que
+   dobra de verdade, em vez de uma textura impressa e estática. */
 .sheet__face::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 3;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0.14), rgba(255, 255, 255, 0.05) 22%, transparent 46%, transparent 78%, rgba(0, 0, 0, 0.1));
+  opacity: 0.4;
+}
+.sheet--forward .sheet__face::after, .sheet--backward .sheet__face::after {
+  animation: curl var(--flip-duration) var(--ease-page) forwards;
 }
 
 /* Sombreado da virada: escuro concentrado na lombada, pico quando a folha
-   esta de perfil. Sem a antiga faixa de reflexo branco. */
+   esta de perfil. Pico de opacidade mais baixo que antes (era 0.85): escurecia
+   demais a página saindo. Sem a antiga faixa de reflexo branco. */
 .sheet__shade {
   position: absolute; inset: 0; pointer-events: none; z-index: 4;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 58%);
@@ -229,22 +237,30 @@
 .sheet--forward .sheet__cast { animation: cast var(--flip-duration) var(--ease-page) forwards; }
 .sheet--backward .sheet__cast { animation: cast var(--flip-duration) var(--ease-page) reverse forwards; }
 
+/* `scaleY` sutil no meio do giro: a folha "incha" de leve quando está de
+   perfil, como o leve arqueamento de uma página de verdade sendo virada, em
+   vez de girar perfeitamente plana feito um cartão rígido. */
 @keyframes flip-forward {
-  0%   { transform: rotateY(0deg); }
-  100% { transform: rotateY(-180deg); }
+  0%   { transform: rotateY(0deg) scaleY(1); }
+  50%  { transform: rotateY(-90deg) scaleY(1.018); }
+  100% { transform: rotateY(-180deg) scaleY(1); }
 }
 @keyframes flip-backward {
-  0%   { transform: rotateY(-180deg); }
-  100% { transform: rotateY(0deg); }
+  0%   { transform: rotateY(-180deg) scaleY(1); }
+  50%  { transform: rotateY(-90deg) scaleY(1.018); }
+  100% { transform: rotateY(0deg) scaleY(1); }
 }
 @keyframes shade {
-  0% { opacity: 0; } 48% { opacity: 0.85; } 100% { opacity: 0; }
+  0% { opacity: 0; } 48% { opacity: 0.55; } 100% { opacity: 0; }
 }
 @keyframes cast {
   0% { opacity: 0; } 40% { opacity: 0.6; } 100% { opacity: 0; }
 }
+@keyframes curl {
+  0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .sheet { animation-duration: 150ms !important; }
-  .sheet__shade, .sheet__cast { animation: none !important; }
+  .sheet__shade, .sheet__cast, .sheet__face::after { animation: none !important; }
 }

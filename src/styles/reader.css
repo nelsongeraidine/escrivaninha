@@ -63,6 +63,7 @@
 .controls__sep { width: 1px; height: 20px; background: rgba(201, 164, 92, 0.2); margin: 0 3px; }
 
 .indicator {
+  position: relative;
   padding: 4px 10px; font-variant-numeric: tabular-nums; white-space: nowrap;
   color: var(--gold-200); letter-spacing: 0.02em;
   border-radius: 8px;
@@ -73,6 +74,27 @@ button.indicator:hover { background: rgba(201, 164, 92, 0.12); }
   width: 4.5em; font: inherit; text-align: right;
   background: rgba(0, 0, 0, 0.4); color: var(--cream-100);
   border: 1px solid var(--gold-500); border-radius: 6px; padding: 3px 6px;
+}
+/* Página fora do intervalo: o campo balança e fica bordô por um instante; a
+   mensagem aparece como uma bolha abaixo, sem empurrar o resto da barra. */
+.indicator__input--invalid {
+  border-color: var(--bordeaux-600);
+  animation: indicator-shake 220ms ease;
+}
+.indicator__error {
+  position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  white-space: nowrap; font-size: 11px; color: var(--cream-100);
+  background: var(--bordeaux-700); padding: 4px 8px; border-radius: 6px;
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+@keyframes indicator-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .indicator__input--invalid { animation: none; }
 }
 .zoom { display: inline-flex; align-items: center; gap: 2px; }
 .zoom__value { min-width: 3.4em; text-align: center; font-variant-numeric: tabular-nums; color: var(--cream-100); }

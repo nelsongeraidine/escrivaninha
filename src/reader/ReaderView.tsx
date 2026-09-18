@@ -58,11 +58,19 @@ function ReaderInner({ book, onBack }: Props) {
 
   const onMetrics = useCallback((m: PageMetrics) => setMetrics(m), []);
 
-  // Ultima pagina de fato visivel no spread: base para desabilitar "Proxima".
-  const currentSpread = pagesInSpread(nav.spreadIndex, nav.mode, nav.pageCount);
-  const lastVisiblePage = currentSpread.kind === 'single'
-    ? currentSpread.page
-    : currentSpread.right ?? currentSpread.left ?? nav.currentPage;
+  // Indicador mostra o destino da virada assim que ela começa, não só quando
+  // termina: num livro de verdade a numeração muda no momento em que a folha
+  // sai do lugar, não 650ms depois. `nav.currentPage` (confirmado) continua
+  // sendo o que persiste e o que o prefetch usa; isto é só para exibição.
+  const displaySpreadIndex = nav.flip ? nav.flip.to : nav.spreadIndex;
+  const displaySpread = pagesInSpread(displaySpreadIndex, nav.mode, nav.pageCount);
+  const displayPage = displaySpread.kind === 'single'
+    ? displaySpread.page
+    : displaySpread.left ?? displaySpread.right ?? nav.currentPage;
+  // Ultima pagina de fato visivel no spread de destino: base para desabilitar "Proxima".
+  const lastVisiblePage = displaySpread.kind === 'single'
+    ? displaySpread.page
+    : displaySpread.right ?? displaySpread.left ?? nav.currentPage;
 
   // Teclado global: setas/PageUp-Down/Home/End viram página; Esc sai da tela cheia.
   const handlers = useMemo(() => ({
@@ -115,7 +123,7 @@ function ReaderInner({ book, onBack }: Props) {
       <div onMouseEnter={() => hold(true)} onMouseLeave={() => hold(false)} onFocus={() => hold(true)} onBlur={() => hold(false)}>
         <ReaderControls
           visible={visible}
-          page={nav.currentPage} pageCount={nav.pageCount} lastVisiblePage={lastVisiblePage} zoom={zoom} fullscreen={fullscreen}
+          page={displayPage} pageCount={nav.pageCount} lastVisiblePage={lastVisiblePage} zoom={zoom} fullscreen={fullscreen}
           onPrev={nav.prev} onNext={nav.next} onGoTo={nav.goToPage}
           onZoomIn={() => setZoom((z) => nextZoom(z))} onZoomOut={() => setZoom((z) => prevZoom(z))}
           onToggleFullscreen={toggleFullscreen}

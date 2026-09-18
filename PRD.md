@@ -1,6 +1,6 @@
 # PRD: Escrivaninha
 
-Data de Atualização: 18-09-2026_Versão 0.17
+Data de Atualização: 18-09-2026_Versão 0.18
 
 ## 1. Produto
 
@@ -112,5 +112,6 @@ com as fixtures de 3, 50 e 800 páginas. Roteiro em `docs/validation.md`.
 | 0.15 | 18-09-2026 | Correções P2 da revisão UI/UX: zoom acima de 100% recentraliza o scroll no vinco ao mudar de nível e barras de rolagem na paleta madeira, em vez de recortar o livro com barras cinzas nativas; tela de erro ganha "Escolher outro arquivo" como ação primária (reabre o seletor direto, sem forçar volta à biblioteca), mantendo "Voltar para a biblioteca" como secundária. |
 | 0.16 | 18-09-2026 | Lote de observações menores da revisão UI/UX: indicador mostra "Páginas X-Y" quando o spread tem duas páginas visíveis; nome do arquivo aparece no canto do leitor (some/aparece com o resto do chrome); "← Biblioteca" com seta em SVG no lugar do glifo de texto; parágrafo de privacidade não encosta mais na borda no mobile; contraste da assinatura do rodapé e do rótulo "Continuar lendo" ajustados para AA. |
 | 0.17 | 18-09-2026 | P3 da revisão UI/UX: camada de texto selecionável/pesquisável do pdf.js sobre o canvas de cada página. Habilita copiar texto, busca nativa do navegador (Ctrl+F) e leitura por tecnologia assistiva nas páginas visíveis; o canvas vira decorativo (`aria-hidden`) e a página ganha `role="group"`/`aria-label`. Verificado que o clique para virar página (RF07) continua funcionando em cima do texto. |
+| 0.18 | 18-09-2026 | Últimos itens do backlog do critique: indicador mostra o destino da virada assim que ela começa, não só ao terminar; salto de página fora do intervalo mostra aviso inline e mantém o campo aberto para corrigir, em vez de clampar em silêncio; virada de página com leve `scaleY` no meio do giro e realce de curvatura animado (`curl`), sombra de pico mais baixa (0,85→0,55). |
 
 Spec técnico detalhado: `docs/superpowers/specs/2026-09-02-escrivaninha-design.md`.

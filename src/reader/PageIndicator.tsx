@@ -10,16 +10,21 @@ interface Props {
 export function PageIndicator({ page, pageCount, onGoTo, lastVisiblePage }: Props) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(String(page));
+  // Só marca erro num Enter fora do intervalo (o usuário ainda está ali, vendo
+  // o campo): no blur o valor é aceito e clampado em silêncio, como antes, para
+  // nunca prender o foco num estado que só se corrige clicando de novo ali.
+  const [invalid, setInvalid] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   // `onBlur={commit}` dispara de novo quando o input desmonta logo após Enter ou
   // Escape. Sem esta trava: Enter chamaria `onGoTo` duas vezes e Escape acabaria
   // "confirmando" o número digitado em vez de cancelar.
   const skipCommit = useRef(false);
   const inputId = useId();
+  const errorId = useId();
 
   // Ao abrir o editor: zera a trava, parte do valor atual e seleciona tudo.
   useEffect(() => {
-    if (editing) { skipCommit.current = false; setValue(String(page)); inputRef.current?.select(); }
+    if (editing) { skipCommit.current = false; setValue(String(page)); setInvalid(false); inputRef.current?.select(); }
   }, [editing, page]);
 
   function commit() {
@@ -36,7 +41,11 @@ export function PageIndicator({ page, pageCount, onGoTo, lastVisiblePage }: Prop
     // Parar propagação: as setas aqui editam o número e o handler global de
     // teclado da janela (Task 13) não deve virar a página enquanto edito.
     e.stopPropagation();
-    if (e.key === 'Enter') commit();
+    if (e.key === 'Enter') {
+      const n = Number.parseInt(value, 10);
+      if (!Number.isFinite(n) || n < 1 || n > pageCount) { setInvalid(true); return; }
+      commit();
+    }
     // Escape cancela sem salvar; a trava impede que o blur de desmonte comite.
     if (e.key === 'Escape') { skipCommit.current = true; setEditing(false); }
   }
@@ -46,9 +55,13 @@ export function PageIndicator({ page, pageCount, onGoTo, lastVisiblePage }: Prop
       <span className="indicator">
         <label className="visually-hidden" htmlFor={inputId}>Ir para a página</label>
         <input id={inputId} ref={inputRef} type="number" min={1} max={pageCount} value={value}
-          className="indicator__input" autoFocus
-          onChange={(e) => setValue(e.target.value)} onKeyDown={onKey} onBlur={commit} />
+          className={`indicator__input${invalid ? ' indicator__input--invalid' : ''}`} autoFocus
+          aria-invalid={invalid} aria-describedby={invalid ? errorId : undefined}
+          onChange={(e) => { setValue(e.target.value); setInvalid(false); }} onKeyDown={onKey} onBlur={commit} />
         <span className="indicator__total"> / {pageCount}</span>
+        {invalid && (
+          <span id={errorId} className="indicator__error" role="alert">Digite um número de 1 a {pageCount}.</span>
+        )}
       </span>
     );
   }

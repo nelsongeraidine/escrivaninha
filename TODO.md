@@ -25,12 +25,15 @@ Convenção: `[ ]` pendente, `[x]` feito. Cada item cita o(s) arquivo(s) afetado
 - [x] `.continue__label` ("Continuar lendo") estava a 10px, abaixo do piso de 11px; ajustado para 11px. (`src/styles/library.css`)
 - [x] "← Biblioteca" usava um glifo de seta em texto; agora usa o mesmo conjunto de ícones SVG traçados do resto da barra. (`src/reader/ReaderView.tsx`)
 
-## Pendente — observações menores (ficaram de fora do lote, risco/esforço maior)
+## Feito (últimos itens do lote, 18-09-2026 v0.18)
 
-- [ ] Número da página atrasa durante a virada (só atualiza no fim da animação). (`src/reader/Sheet.tsx`, `src/book/useBookNavigation.ts`)
-- [ ] Salto para página fora do intervalo (input de página) não dá feedback visual do clamp. Avaliado: dar feedback sem arriscar travar o input em estados de foco/blur (já teve bug de dupla-confirmação Enter/Esc nesta área) precisa de mais cuidado que os outros itens do lote. (`src/reader/PageIndicator.tsx`)
-- [ ] Folha em movimento não tem curvatura (lê como cartão, não como papel); pico de sombra em 0,85 escurece bastante a página saindo. (`src/styles/book.css`)
-- [ ] Sem sumário/TOC, busca ou miniaturas; no livro de 800 páginas o único jeito de chegar na página 600 é o salto numérico. (evolução maior, fora do MVP)
+- [x] **Número da página atrasava durante a virada.** O indicador agora mostra o spread de destino (`nav.flip.to`) assim que a virada começa, não só ao terminar; `nav.currentPage` (confirmado) continua sendo o que persiste e o que o prefetch usa. Confirmado ao vivo: 80ms dentro de uma virada de 650ms o indicador já mostrava "Páginas 12-13", não mais "10-11". (`src/reader/ReaderView.tsx`)
+- [x] **Salto para página fora do intervalo não dava feedback.** Um Enter fora de 1..N mostra aviso inline (`role="alert"`, campo treme e fica bordô) e mantém o campo aberto para corrigir; editar de novo já limpa o aviso; um blur (clicar fora) continua aceitando o valor bruto e deixando o clamp para `goToPage`, exatamente como antes, para nunca prender o foco. 3 testes novos cobrindo o fluxo. (`src/reader/PageIndicator.tsx`, `src/reader/PageIndicator.test.tsx`, `src/styles/reader.css`)
+- [x] **Folha sem curvatura, lia como cartão.** `scaleY(1.018)` sutil no meio do giro (a folha "incha" de leve ao ficar de perfil); o realce de curvatura (`sheet__face::after`) ganhou uma animação própria (`curl`) que intensifica no meio da virada em vez de ficar estático; pico de sombra reduzido de 0,85 para 0,55. Confirmado ao vivo via amostras de opacidade computada durante a animação (0,41 → 0,90 → 0,99 → 0,53 → 0,40). (`src/styles/book.css`)
+
+## Pendente
+
+- [ ] Sem sumário/TOC, busca ou miniaturas; no livro de 800 páginas o único jeito de chegar na página 600 é o salto numérico. Busca hoje só alcança as páginas renderizadas na tela (a camada de texto do item P3 acima cobre isso). Evolução maior, fora do MVP: precisaria de um índice de texto do livro inteiro, não só das páginas visíveis.
 
 ## Decisão registrada — deixar como está
 
