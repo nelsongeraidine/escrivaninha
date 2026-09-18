@@ -1,6 +1,6 @@
 # PRD: Escrivaninha
 
-Data de Atualização: 18-09-2026_Versão 0.14
+Data de Atualização: 18-09-2026_Versão 0.15
 
 ## 1. Produto
 
@@ -109,5 +109,6 @@ com as fixtures de 3, 50 e 800 páginas. Roteiro em `docs/validation.md`.
 | 0.12 | 02-09-2026 | Refino visual (revisão UI/UX): proporção do livro na tela, papel unificado marfim, madeira de verdade no fundo/mesa, vinco e blocos de página, sombra de contato, sombreado da virada, tipografia do título, controles com ícones SVG e vidro quente, polimento mobile e tela cheia. |
 | 0.13 | 02-09-2026 | Assinatura discreta "feito por @nelsonggeraidine" (link para o Instagram) abaixo do aviso de privacidade na biblioteca. EPUB avaliado e descartado por ora (exigiria segundo motor de renderização e dependência nova). |
 | 0.14 | 18-09-2026 | Correções P1 da revisão UI/UX (`$impeccable critique`): barra de controles não some mais no toque sem antes revelar (faixa morta de 30% em torno da lombada separa "revelar" de "virar página"), fantasma a 14% de opacidade em vez de sumir por completo, "← Biblioteca" e a barra nunca escondem antes da primeira interação real do usuário no livro; biblioteca com um único `<input type="file">` (o pill "Abrir PDF" aciona o mesmo seletor da dropzone) e anel de foco dourado visível no painel inteiro via `:focus-within`. |
+| 0.15 | 18-09-2026 | Correções P2 da revisão UI/UX: zoom acima de 100% recentraliza o scroll no vinco ao mudar de nível e barras de rolagem na paleta madeira, em vez de recortar o livro com barras cinzas nativas; tela de erro ganha "Escolher outro arquivo" como ação primária (reabre o seletor direto, sem forçar volta à biblioteca), mantendo "Voltar para a biblioteca" como secundária. |
 
 Spec técnico detalhado: `docs/superpowers/specs/2026-09-02-escrivaninha-design.md`.

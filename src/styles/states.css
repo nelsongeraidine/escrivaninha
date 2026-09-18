@@ -23,6 +23,8 @@
   margin: 0;
 }
 
+.state__actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
 .state__progress {
   width: 240px;
   height: 3px;

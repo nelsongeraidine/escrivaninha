@@ -9,6 +9,17 @@
    sai e a rolagem horizontal volta a existir. */
 .book-area[data-zoom-fit] { overflow-x: clip; }
 
+/* Barras de rolagem na paleta madeira em vez das cinzas nativas do sistema,
+   que quebravam a moldura de livro assim que o zoom passava de 100%. */
+.book-area {
+  scrollbar-width: thin;
+  scrollbar-color: var(--wood-500) var(--wood-900);
+}
+.book-area::-webkit-scrollbar { width: 10px; height: 10px; }
+.book-area::-webkit-scrollbar-track { background: var(--wood-900); }
+.book-area::-webkit-scrollbar-thumb { background: var(--wood-500); border-radius: 999px; border: 2px solid var(--wood-900); }
+.book-area::-webkit-scrollbar-thumb:hover { background: var(--gold-500); }
+
 /* A perspectiva fica neste palco, nao em `.book-area`: aquele elemento rola
    (`overflow: auto`) e recortaria a folha 3D ao girar sobre a lombada. O padding
    generoso e o que da "ar" ao redor do livro, como um livro sobre a mesa. */

@@ -75,6 +75,18 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }
   // `metrics` é memoizado em `usePageMetrics`, então este effect só roda quando
   // uma métrica muda de fato; `onMetrics` vem estável por `useCallback` no pai.
   useEffect(() => { onMetrics?.(metrics); }, [metrics, onMetrics]);
+
+  // Ao mudar o zoom (ou o modo spread/single), recentraliza o scroll no vinco.
+  // Sem isso, zoom > 100% deixava o scroll no canto superior esquerdo: o livro
+  // saía do centro da mesa e ficava cortado em cima/embaixo sem aviso.
+  // `useLayoutEffect` porque o `--page-w/h` já mudou no mesmo commit; rodar
+  // depois evitaria um frame com o scroll antigo antes de recentralizar.
+  useLayoutEffect(() => {
+    const el = areaRef.current;
+    if (!el) return;
+    el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+    el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
+  }, [zoom, nav.mode]);
   const spread = pagesInSpread(nav.spreadIndex, nav.mode, nav.pageCount);
 
   // Durante um flip a base mostra o que fica parado: esquerda do spread menor

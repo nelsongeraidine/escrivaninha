@@ -30,6 +30,14 @@ export function App() {
     return <LibraryView onFile={(f) => { void openFile(f); }} continueInfo={continueInfo} />;
   }
   if (state.status === 'loading') return <LoadingState name={state.name} progress={state.progress} />;
-  if (state.status === 'error') return <ErrorState message={state.message} onBack={() => dispatch({ type: 'dismiss-error' })} />;
+  if (state.status === 'error') {
+    return (
+      <ErrorState
+        message={state.message}
+        onBack={() => dispatch({ type: 'dismiss-error' })}
+        onPickFile={(f) => { void openFile(f); }}
+      />
+    );
+  }
   return <ReaderView book={state.book} onBack={() => dispatch({ type: 'back-to-library' })} />;
 }
