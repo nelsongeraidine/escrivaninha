@@ -10,8 +10,10 @@ import { useAutoHide } from '../shared/useAutoHide';
 import { useKeyboardNav } from '../shared/useKeyboardNav';
 import { useSwipe } from '../shared/useSwipe';
 import { saveReadingState } from '../persistence/readingState';
+import { useBookSearch } from '../pdf/useBookSearch';
 import { Book, type PageMetrics } from './Book';
 import { ReaderControls } from './ReaderControls';
+import { SearchPanel } from './SearchPanel';
 
 interface Props { book: OpenBook; onBack: () => void }
 
@@ -56,6 +58,19 @@ function ReaderInner({ book, onBack }: Props) {
   }, [nav.currentPage, zoom, fullscreen]);
   const { visible, poke, hold } = useAutoHide(2500, interacted);
 
+  const [searchOpen, setSearchOpen] = useState(false);
+  const search = useBookSearch(nav.pageCount);
+  const closeSearch = useCallback(() => { setSearchOpen(false); hold(false); }, [hold]);
+  const toggleSearch = useCallback(() => {
+    setSearchOpen((open) => {
+      // Abrir a busca segura a barra visível (igual passar o mouse em cima);
+      // fechar devolve ao auto-hide normal.
+      hold(!open);
+      return !open;
+    });
+  }, [hold]);
+  const jumpToResult = useCallback((page: number) => { nav.goToPage(page); closeSearch(); }, [nav, closeSearch]);
+
   const onMetrics = useCallback((m: PageMetrics) => setMetrics(m), []);
 
   // Indicador mostra o destino da virada assim que ela começa, não só quando
@@ -76,8 +91,13 @@ function ReaderInner({ book, onBack }: Props) {
   const handlers = useMemo(() => ({
     next: nav.next, prev: nav.prev,
     first: () => nav.goToPage(1), last: () => nav.goToPage(nav.pageCount),
-    exitFullscreen: () => { if (document.fullscreenElement) void document.exitFullscreen(); },
-  }), [nav]);
+    // Esc fecha a busca primeiro (se estiver com foco fora do campo de texto,
+    // ex.: num resultado clicado); só sai de tela cheia se a busca já estiver fechada.
+    exitFullscreen: () => {
+      if (searchOpen) { closeSearch(); return; }
+      if (document.fullscreenElement) void document.exitFullscreen();
+    },
+  }), [nav, searchOpen, closeSearch]);
   useKeyboardNav(handlers);
 
   // Swipe horizontal no toque: esquerda avança, direita volta.
@@ -118,6 +138,12 @@ function ReaderInner({ book, onBack }: Props) {
       {/* Nome do livro: some/aparece junto com o resto do chrome. Sem isso a
           moldura de "biblioteca particular" evapora assim que o livro abre. */}
       <div className="reader__title" data-visible={visible} aria-hidden="true">{book.name}</div>
+      <SearchPanel
+        open={searchOpen}
+        query={search.query} onQueryChange={search.setQuery}
+        results={search.results} indexing={search.indexing} progress={search.progress}
+        onJump={jumpToResult} onClose={closeSearch}
+      />
       <Book nav={nav} pageSize={book.loaded.pageSize} zoom={zoom} onMetrics={onMetrics}
         onClickSide={(s) => (s === 'right' ? nav.next() : nav.prev())} onFlipDone={nav.finishFlip} />
       <div onMouseEnter={() => hold(true)} onMouseLeave={() => hold(false)} onFocus={() => hold(true)} onBlur={() => hold(false)}>
@@ -127,6 +153,7 @@ function ReaderInner({ book, onBack }: Props) {
           onPrev={nav.prev} onNext={nav.next} onGoTo={nav.goToPage}
           onZoomIn={() => setZoom((z) => nextZoom(z))} onZoomOut={() => setZoom((z) => prevZoom(z))}
           onToggleFullscreen={toggleFullscreen}
+          onToggleSearch={toggleSearch} searchActive={searchOpen}
         />
       </div>
     </div>

@@ -11,6 +11,7 @@ interface Props {
   lastVisiblePage: number;
   onPrev: () => void; onNext: () => void; onGoTo: (p: number) => void;
   onZoomIn: () => void; onZoomOut: () => void; onToggleFullscreen: () => void;
+  onToggleSearch: () => void; searchActive: boolean;
 }
 
 // Icones em SVG (stroke, currentColor) para um conjunto visualmente coerente
@@ -29,6 +30,14 @@ function ChevronRight() {
     </svg>
   );
 }
+function SearchIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.9" />
+      <path d="M20 20l-4.6-4.6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export function ReaderControls(p: Props) {
   return (
@@ -40,6 +49,9 @@ export function ReaderControls(p: Props) {
       <ZoomControls zoom={p.zoom} onZoomIn={p.onZoomIn} onZoomOut={p.onZoomOut} />
       <span className="controls__sep" aria-hidden="true" />
       <FullscreenButton active={p.fullscreen} onToggle={p.onToggleFullscreen} />
+      <button type="button" onClick={p.onToggleSearch} aria-label="Buscar no livro" aria-pressed={p.searchActive}>
+        <SearchIcon />
+      </button>
     </div>
   );
 }

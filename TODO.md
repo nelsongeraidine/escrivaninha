@@ -31,9 +31,15 @@ Convenção: `[ ]` pendente, `[x]` feito. Cada item cita o(s) arquivo(s) afetado
 - [x] **Salto para página fora do intervalo não dava feedback.** Um Enter fora de 1..N mostra aviso inline (`role="alert"`, campo treme e fica bordô) e mantém o campo aberto para corrigir; editar de novo já limpa o aviso; um blur (clicar fora) continua aceitando o valor bruto e deixando o clamp para `goToPage`, exatamente como antes, para nunca prender o foco. 3 testes novos cobrindo o fluxo. (`src/reader/PageIndicator.tsx`, `src/reader/PageIndicator.test.tsx`, `src/styles/reader.css`)
 - [x] **Folha sem curvatura, lia como cartão.** `scaleY(1.018)` sutil no meio do giro (a folha "incha" de leve ao ficar de perfil); o realce de curvatura (`sheet__face::after`) ganhou uma animação própria (`curl`) que intensifica no meio da virada em vez de ficar estático; pico de sombra reduzido de 0,85 para 0,55. Confirmado ao vivo via amostras de opacidade computada durante a animação (0,41 → 0,90 → 0,99 → 0,53 → 0,40). (`src/styles/book.css`)
 
+## Feito (evolução: busca no livro aberto, 18-09-2026 v0.19)
+
+- [x] **Busca em todo o livro aberto**, não só nas páginas na tela. Escopo confirmado antes de implementar: o leitor continua de 1 livro por vez (não virou biblioteca com vários PDFs salvos), então o índice cobre só o livro atualmente aberto. Indexação preguiçosa (só começa na primeira busca, para não competir com o carregamento do livro), baixa concorrência (3 páginas por vez), sem persistir entre sessões. Painel com campo de busca + lista de resultados (página + trecho com o termo destacado); clicar num resultado pula direto e fecha o painel; Esc fecha. Busca simples por substring, case-insensitive, sem normalização de acento nem stemming; um resultado por página. Sem dependência nova (só `pdfjs-dist`, já no projeto). (`src/pdf/useBookSearch.ts`, `src/pdf/useBookSearch.test.tsx`, `src/reader/SearchPanel.tsx`, `src/reader/ReaderControls.tsx`, `src/reader/ReaderView.tsx`, `src/styles/reader.css`)
+  - **Bug real encontrado e corrigido durante o teste**: a indexação ficava travada em 0% para sempre num livro de 800 páginas. Causa: o StrictMode do React (dev) monta → desmonta → remonta os efeitos uma vez; o cleanup do meu efeito zerava a flag de cancelamento (`cancelled.current = true`) e nada a religava para `false` na montagem real, então todo worker de indexação desistia sem erro nenhum logo no primeiro laço. Corrigido zerando a flag no corpo do efeito, não só no cleanup. Confirmado ao vivo: 800 páginas indexadas em ~1,5s depois da correção.
+  - Sem sumário/TOC nem miniaturas ainda (não fizeram parte deste escopo); ver "Pendente" abaixo.
+
 ## Pendente
 
-- [ ] Sem sumário/TOC, busca ou miniaturas; no livro de 800 páginas o único jeito de chegar na página 600 é o salto numérico. Busca hoje só alcança as páginas renderizadas na tela (a camada de texto do item P3 acima cobre isso). Evolução maior, fora do MVP: precisaria de um índice de texto do livro inteiro, não só das páginas visíveis.
+- [ ] Sumário (TOC) lendo os marcadores/bookmarks do PDF (`doc.getOutline()`), quando o arquivo tiver essa estrutura. Miniaturas (tira de páginas para navegar visualmente). Nenhum dos fixtures de teste do projeto tem marcadores, então validar o TOC precisaria de um PDF real com essa estrutura.
 
 ## Decisão registrada — deixar como está
 
