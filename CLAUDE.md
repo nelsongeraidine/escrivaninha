@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Data de Atualização: 18-09-2026_Versão 0.16
+Data de Atualização: 18-09-2026_Versão 0.17
 
 ## Visão geral
 
@@ -17,7 +17,7 @@ Stack: Vite 8 + React 19 + TypeScript strict, `pdfjs-dist` 6 (worker via `?url`,
 - `src/app/`: App e máquina de estados.
 - `src/library/`: tela inicial, dropzone, card "Continuar lendo".
 - `src/reader/`: ReaderView, Book/Sheet/Page, controles, loading e erro. `Sheet.tsx` roda a virada em CSS 3D: `@keyframes` em `src/styles/book.css`, com `animationend` e fallback de 900 ms.
-- `src/pdf/`: carga do documento, fila de render (concorrência 2, cancelável), cache LRU de `ImageBitmap` (24 entradas / ~100 MB), prefetch ±4 páginas.
+- `src/pdf/`: carga do documento, fila de render (concorrência 2, cancelável), cache LRU de `ImageBitmap` (24 entradas / ~100 MB), prefetch ±4 páginas. `usePageTextLayer.ts` injeta a `TextLayer` do pdf.js sobre o canvas (texto selecionável, Ctrl+F, leitura por tecnologia assistiva); reconstrói do zero a cada troca de página/zoom, sem cache.
 - `src/book/`: `spreadLayout.ts` (funções puras página↔sheet↔spread: spread 0 = capa sozinha; spread k = (2k, 2k+1); sheet k = frente 2k+1 / verso 2k+2), `useBookNavigation.ts` (estado do flip e fila de viradas), `zoomLevels.ts`.
 - `src/persistence/`: IndexedDB (`escrivaninha/books`, arquivo (ArrayBuffer, reconstruído como Blob) até 150 MB) e localStorage (página, zoom).
 - `src/shared/`: fullscreen, teclado, swipe, media query, mapeamento de erros.

@@ -1,11 +1,17 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { PageRenderer, createPdfBackend } from './pageRenderer';
 import { BitmapCache } from './bitmapCache';
 import type { OpenBook } from '../app/appState';
 
-const Ctx = createContext<PageRenderer | null>(null);
+interface RendererCtxValue { renderer: PageRenderer; doc: PDFDocumentProxy }
 
-// Um renderer por livro: trocar de livro descarta fila e cache juntos.
+const Ctx = createContext<RendererCtxValue | null>(null);
+
+// Um renderer por livro: trocar de livro descarta fila e cache juntos. O `doc`
+// viaja junto porque a camada de texto (usePageTextLayer) precisa do
+// PDFDocumentProxy para pedir `getTextContent()`, e é o mesmo documento que o
+// renderer já usa para rasterizar.
 export function RendererProvider({ book, children }: { book: OpenBook; children: ReactNode }) {
   const renderer = useMemo(() => new PageRenderer(createPdfBackend(book.loaded), new BitmapCache()), [book]);
   // O cleanup roda também no unmount/remount duplo do StrictMode em dev. Como o
@@ -14,11 +20,18 @@ export function RendererProvider({ book, children }: { book: OpenBook; children:
   // Ele agora também fecha os bitmaps em cache, então em dev o segundo mount
   // re-pede as páginas (cache miss) e as renderiza de novo; é inofensivo.
   useEffect(() => () => renderer.dispose(), [renderer]);
-  return <Ctx.Provider value={renderer}>{children}</Ctx.Provider>;
+  const value = useMemo(() => ({ renderer, doc: book.loaded.doc }), [renderer, book.loaded.doc]);
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useRenderer(): PageRenderer {
-  const r = useContext(Ctx);
-  if (!r) throw new Error('useRenderer fora de RendererProvider');
-  return r;
+  const ctx = useContext(Ctx);
+  if (!ctx) throw new Error('useRenderer fora de RendererProvider');
+  return ctx.renderer;
+}
+
+export function useDocument(): PDFDocumentProxy {
+  const ctx = useContext(Ctx);
+  if (!ctx) throw new Error('useDocument fora de RendererProvider');
+  return ctx.doc;
 }

@@ -99,8 +99,49 @@
 }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
+/* Camada de texto selecionavel do pdf.js sobre o canvas: habilita selecionar,
+   copiar e a busca nativa (Ctrl+F) do navegador. Adaptado do `.textLayer`
+   oficial do pdf.js (pdfjs-dist/web/pdf_viewer.css), sem o que nao usamos
+   aqui (anotacoes, editor de destaque, imagens clicaveis). `--scale-factor` e
+   quem converte as metricas de fonte (em pontos do PDF) para px de CSS; quem
+   define o valor e `usePageTextLayer`, por pagina. */
+.page__text {
+  position: absolute; inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  letter-spacing: normal; word-spacing: normal;
+  -webkit-text-size-adjust: none; text-size-adjust: none;
+  transform-origin: 0 0;
+  --user-unit: 1;
+  --total-scale-factor: calc(var(--scale-factor) * var(--user-unit));
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+.page__text :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+}
+.page__text > :not(.markedContent),
+.page__text .markedContent span:not(.markedContent) {
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+.page__text .markedContent { display: contents; }
+.page__text ::selection { background: rgba(201, 164, 92, 0.35); color: transparent; }
+
 /* Vale da lombada: escurece a borda interna das paginas com queda larga.
-   z-index 2 mantem a sombra acima do overlay de papel. */
+   z-index 2 mantem a sombra acima do overlay de papel. pointer-events: none
+   porque e decoracao pura; sem isso essa faixa bloquearia a selecao de texto
+   bem perto da lombada. */
 .page--left::after, .page--right::after {
   content: ''; position: absolute; top: 0; bottom: 0; width: 10%;
   pointer-events: none; z-index: 2;

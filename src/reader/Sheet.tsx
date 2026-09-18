@@ -34,11 +34,11 @@ export function Sheet({ flip, metrics, mode, onDone }: Props) {
   return (
     <div ref={ref} className={`sheet sheet--${flip.direction} sheet--${mode}`} style={{ width: metrics.cssWidth, height: metrics.cssHeight }} aria-hidden="true">
       <div className="sheet__face sheet__face--front">
-        <Page page={flip.front} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side={mode === 'spread' ? 'right' : 'single'} />
+        <Page page={flip.front} scale={metrics.scale} cssScale={metrics.cssScale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side={mode === 'spread' ? 'right' : 'single'} textLayer={false} />
         <div className="sheet__shade" />
       </div>
       <div className="sheet__face sheet__face--back">
-        <Page page={flip.back} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="left" />
+        <Page page={flip.back} scale={metrics.scale} cssScale={metrics.cssScale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="left" textLayer={false} />
         <div className="sheet__shade" />
       </div>
       <div className="sheet__cast" />

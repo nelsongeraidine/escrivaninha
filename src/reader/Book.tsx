@@ -15,7 +15,14 @@ interface Props {
   onMetrics?: (m: PageMetrics) => void;
 }
 
-export interface PageMetrics { cssWidth: number; cssHeight: number; scale: number }
+export interface PageMetrics {
+  cssWidth: number; cssHeight: number;
+  /** Escala de renderização do bitmap (px físicos, já multiplicada pelo devicePixelRatio). */
+  scale: number;
+  /** Escala em px de CSS (sem devicePixelRatio): o que a camada de texto do
+      pdf.js precisa para posicionar o texto exatamente sobre o canvas exibido. */
+  cssScale: number;
+}
 
 export function usePageMetrics(
   container: RefObject<HTMLElement | null>,
@@ -58,6 +65,7 @@ export function usePageMetrics(
       cssWidth: Math.round(pageSize.width * cssScale),
       cssHeight: Math.round(pageSize.height * cssScale),
       scale: Number((cssScale * dpr).toFixed(3)),
+      cssScale: Number(cssScale.toFixed(3)),
     };
   }, [area.w, area.h, pageSize.width, pageSize.height, mode, zoom]);
 }
@@ -127,7 +135,7 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }
               if (r.width && (r.width - (e.clientX - r.left)) / r.width <= DEAD_ZONE) return;
               onClickSide?.('left');
             }}>
-              <Page page={left} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="left" />
+              <Page page={left} scale={metrics.scale} cssScale={metrics.cssScale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="left" />
             </div>
             <div className="book__side book__side--right" onClick={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
@@ -135,7 +143,7 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }
               if (r.width && (e.clientX - r.left) / r.width <= DEAD_ZONE) return;
               onClickSide?.('right');
             }}>
-              <Page page={right} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="right" />
+              <Page page={right} scale={metrics.scale} cssScale={metrics.cssScale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="right" />
             </div>
           </>
         ) : (
@@ -146,7 +154,7 @@ export function Book({ nav, pageSize, zoom, onClickSide, onFlipDone, onMetrics }
             if (frac > 0.5 - DEAD_ZONE && frac < 0.5 + DEAD_ZONE) return;
             onClickSide?.(frac < 0.5 ? 'left' : 'right');
           }}>
-            <Page page={single} scale={metrics.scale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="single" />
+            <Page page={single} scale={metrics.scale} cssScale={metrics.cssScale} cssWidth={metrics.cssWidth} cssHeight={metrics.cssHeight} side="single" />
           </div>
         )}
         <div className="book__spine" aria-hidden="true" />

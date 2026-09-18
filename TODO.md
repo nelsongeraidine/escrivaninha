@@ -12,9 +12,9 @@ Convenção: `[ ]` pendente, `[x]` feito. Cada item cita o(s) arquivo(s) afetado
 - [x] **P2 — Zoom acima de 100% quebrava a metáfora de livro.** Recentraliza o scroll no vinco ao trocar de zoom ou de modo spread/single; barras de rolagem na paleta madeira via `scrollbar-color`/`::-webkit-scrollbar`. (`src/reader/Book.tsx`, `src/styles/book.css`) — 18-09-2026, versão 0.15.
 - [x] **P2 — Tela de erro era beco sem saída.** "Escolher outro arquivo" agora é a ação primária (reabre o seletor direto, sem voltar à biblioteca); "Voltar para a biblioteca" fica como secundária. (`src/reader/ErrorState.tsx`, `src/app/App.tsx`, `src/styles/states.css`) — 18-09-2026, versão 0.15.
 
-## Pendente — P3
+## Feito (P3)
 
-- [ ] **Sem camada de texto do PDF: leitor de tela e busca (Ctrl+F) não funcionam.** Cada página é só um `<canvas role="img" aria-label="Página N">`; sem seleção, sem busca, sem conteúdo legível para tecnologia assistiva. Maior esforço de código do backlog (mexe em `src/pdf/`); único item que é acessibilidade de verdade, não só polimento. Fix: renderizar a camada de texto transparente do pdf.js sobre o canvas; se ficar fora do escopo, declarar isso explicitamente na seção de acessibilidade do PRD. (`src/pdf/`, `src/reader/Page.tsx`)
+- [x] **Sem camada de texto do PDF: leitor de tela e busca (Ctrl+F) não funcionavam.** `TextLayer` do pdf.js injetada sobre o canvas via `usePageTextLayer`; canvas virou `aria-hidden`, página ganhou `role="group"`/`aria-label`. Verificado ao vivo: texto extraído certo, seleção funciona, `window.find()` acha e destaca, e o clique para virar página (RF07) continua funcionando mesmo em cima do texto (clique simples não é bloqueado por `user-select`). Não cobre busca no livro inteiro (só nas páginas renderizadas na tela; item de TOC/busca abaixo continua em aberto). (`src/pdf/usePageTextLayer.ts`, `src/pdf/RendererContext.tsx`, `src/reader/Page.tsx`, `src/reader/Book.tsx`, `src/reader/Sheet.tsx`, `src/styles/book.css`) — 18-09-2026, versão 0.17.
 
 ## Feito (bug de layout + observações menores, lote 18-09-2026 v0.16)
 
